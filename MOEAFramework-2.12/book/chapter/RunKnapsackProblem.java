@@ -3,6 +3,7 @@ package chapter;
 import java.io.IOException;
 
 import org.moeaframework.Executor;
+import org.moeaframework.analysis.plot.Plot;
 import org.moeaframework.core.NondominatedPopulation;
 import org.moeaframework.core.Solution;
 import org.moeaframework.util.Vector;
@@ -14,7 +15,7 @@ public class RunKnapsackProblem {
 				.withProblemClass(KnapsackProblem.class)
 				.withAlgorithm("NSGAII")
 				.withMaxEvaluations(10000)
-				.distributeOnAllCores()
+//				.distributeOnAllCores()
 				.run();
 
 		for (int i = 0; i < result.size(); i++) {
@@ -33,6 +34,10 @@ public class RunKnapsackProblem {
 			
 			
 		}
+		
+		new Plot()
+		.add("NSGAII", result)
+		.show();
 	}
 
 }
