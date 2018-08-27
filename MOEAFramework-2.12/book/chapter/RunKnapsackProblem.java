@@ -11,12 +11,17 @@ import org.moeaframework.util.Vector;
 public class RunKnapsackProblem {
 
 	public static void main(String[] args) throws IOException {
-		NondominatedPopulation result = new Executor()
+		
+		Executor exe = new Executor()
 				.withProblemClass(KnapsackProblem.class)
 				.withAlgorithm("NSGAII")
-				.withMaxEvaluations(10000)
+				.withMaxEvaluations(10000);
+		
+		NondominatedPopulation result = exe
 //				.distributeOnAllCores()
 				.run();
+		
+//		exe.
 
 		for (int i = 0; i < result.size(); i++) {
 			Solution solution = result.get(i);
