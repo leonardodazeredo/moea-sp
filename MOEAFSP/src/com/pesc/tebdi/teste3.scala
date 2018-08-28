@@ -86,7 +86,7 @@ object teste3 extends App {
     variation,
     initialization);
 
-  while (algorithm.getNumberOfEvaluations < 500000) {
+  while (algorithm.getNumberOfEvaluations < 5000) {
     algorithm.step();
   }
 
