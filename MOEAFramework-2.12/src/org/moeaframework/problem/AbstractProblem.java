@@ -17,6 +17,8 @@
  */
 package org.moeaframework.problem;
 
+import java.io.Serializable;
+
 import org.moeaframework.core.Problem;
 
 /**
@@ -26,7 +28,7 @@ import org.moeaframework.core.Problem;
  * {@link #evaluate(org.moeaframework.core.Solution)} methods need to be
  * defined.
  */
-public abstract class AbstractProblem implements Problem {
+public abstract class AbstractProblem implements Problem,Serializable {
 
 	/**
 	 * The number of variables defined by this problem.
