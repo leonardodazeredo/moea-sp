@@ -1,5 +1,7 @@
 package com.pesc.tebdi
 
+import scala.collection.JavaConverters._
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 import org.moeaframework.algorithm.NSGAII
@@ -20,9 +22,9 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
-import chapter.KnapsackProblem
+import org.moeaframework.util.Vector;
 
-import collection.JavaConverters._
+import chapter.KnapsackProblem
 
 class NSGAII_Sp(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
   selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
@@ -37,7 +39,7 @@ class NSGAII_Sp(sc: SparkContext, problem: Problem, population: NondominatedSort
     val solutionsRDD = sc.parallelize(solutionScalaList.to[collection.immutable.Seq])
     val rdd = solutionsRDD.map(s => { p.evaluate(s); s })
     val ss = rdd.collect
-    
+
     this.numberOfEvaluations += ss.size
 
     var i = 0
@@ -84,9 +86,7 @@ object teste3 extends App {
     variation,
     initialization);
 
-  var i = 0
-
-  while (algorithm.getNumberOfEvaluations < 50000) {
+  while (algorithm.getNumberOfEvaluations < 500000) {
     algorithm.step();
   }
 
@@ -96,22 +96,22 @@ object teste3 extends App {
 
   println(algorithm getPopulation () size ())
 
-  //  var i = 1
-  //  for (solution <- result) {
-  //
-  //    var objectives = solution.getObjectives();
-  //
-  //    // negate objectives to return them to their maximized form
-  //    objectives = Vector.negate(objectives);
-  //
-  //    println("Solution " + i + ":");
-  //    println("	" + objectives(0));
-  //    println("	" + objectives(1));
-  //    println("	" + solution.getVariable(0));
-  //
-  //    i += 1
-  //
-  //  }
+//  var i = 1
+//  for (solution <- result) {
+//
+//    var objectives = solution.getObjectives();
+//
+//    // negate objectives to return them to their maximized form
+//    objectives = Vector.negate(objectives);
+//
+//    println("Solution " + i + ":");
+//    println("	" + objectives(0));
+//    println("	" + objectives(1));
+//    println("	" + solution.getVariable(0));
+//
+//    i += 1
+//
+//  }
 
   val p = new Plot()
     .add("NSGAII", result)
