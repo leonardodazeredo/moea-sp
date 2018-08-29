@@ -1,7 +1,7 @@
 package com.pesc.tebdi.adaptor
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
-
+import scala.collection.JavaConverters._
 import org.apache.spark.SparkContext
 import org.moeaframework.algorithm.NSGAII
 import org.moeaframework.analysis.plot.Plot
@@ -22,10 +22,16 @@ import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
 import chapter.KnapsackProblem
+import org.moeaframework.core.operator.InjectedInitialization
 
 class MOEAFrameworkAdaptor {
 
-  def runNSGAII_SP(sc: SparkContext): (Iterable[Solution], Iterable[Solution]) = {
+  def generateRandomPopulation(problem: Problem, size: Int): Iterable[Solution] = {
+    val ini = new RandomInitialization(problem, size)
+    ini.initialize()
+  }
+
+  def runNSGAII_SP(sc: SparkContext, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterable[Solution], Iterable[Solution]) = {
 
     class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
       selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
@@ -56,9 +62,14 @@ class MOEAFrameworkAdaptor {
 
     val problem = new KnapsackProblem();
 
-    val initialization = new RandomInitialization(
+    if (iniPopulation.isEmpty) {
+      val iniPopulation = generateRandomPopulation(problem, 1000)
+    }
+
+    val initialization = new InjectedInitialization(
       problem,
-      1000);
+      100,
+      iniPopulation.asInstanceOf[List[Solution]].asJava);
 
     val selection = new TournamentSelection(
       2,
