@@ -1,7 +1,8 @@
 package com.pesc.tebdi.adaptor
 
-import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.JavaConverters._
+import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+
 import org.apache.spark.SparkContext
 import org.moeaframework.algorithm.NSGAII
 import org.moeaframework.analysis.plot.Plot
@@ -20,18 +21,20 @@ import org.moeaframework.core.operator.RandomInitialization
 import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
-
-import chapter.KnapsackProblem
 import org.moeaframework.core.operator.InjectedInitialization
 
 class MOEAFrameworkAdaptor {
 
   def generateRandomPopulation(problem: Problem, size: Int): Iterable[Solution] = {
+    implicit def arrayToList[A](a: Array[A]) = a.toList
+    
     val ini = new RandomInitialization(problem, size)
-    ini.initialize()
+    //    ini.initialize().asInstanceOf[List[Solution]]
+    
+    ini.initialize().toList
   }
 
-  def runNSGAII_SP(sc: SparkContext, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterable[Solution], Iterable[Solution]) = {
+  def runNSGAII_SP(sc: SparkContext, problem: Problem, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterable[Solution], Iterable[Solution]) = {
 
     class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
       selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
@@ -60,15 +63,13 @@ class MOEAFrameworkAdaptor {
       }
     }
 
-    val problem = new KnapsackProblem();
-
     if (iniPopulation.isEmpty) {
       val iniPopulation = generateRandomPopulation(problem, 1000)
     }
 
     val initialization = new InjectedInitialization(
       problem,
-      100,
+      iniPopulation.size,
       iniPopulation.asInstanceOf[List[Solution]].asJava);
 
     val selection = new TournamentSelection(
