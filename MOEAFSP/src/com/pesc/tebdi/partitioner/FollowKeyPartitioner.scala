@@ -10,8 +10,8 @@ class FollowKeyPartitioner (numParts: Int = 2) extends Partitioner{
   }
 
   override def equals(other: Any): Boolean = other match {
-    case rp: RandomPartitioner =>
-      rp.numPartitions == numPartitions
+    case p: FollowKeyPartitioner =>
+      p.numPartitions == numPartitions
     case _ =>
       false
   }
