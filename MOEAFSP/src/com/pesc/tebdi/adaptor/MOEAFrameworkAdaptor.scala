@@ -26,7 +26,7 @@ import org.moeaframework.core.operator.real.SBX
 
 import com.pesc.tebdi.core.OptimizationContext
 
-class MOEAFrameworkAdaptor extends MOEAAdaptor {
+class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
   def generateRandomPopulation(problem: Problem, size: Int): Iterable[Solution] = {
     implicit def arrayToList[A](a: Array[A]) = a.toList
