@@ -34,7 +34,7 @@ object main {
 
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
-    val pc = OptimizationContext(moeaAdaptor, problem, populationSize = 5000, numOfIslands = 100, migrationPercentage = 0.1)
+    val pc = OptimizationContext(moeaAdaptor, problem, populationSize = 5555, numOfIslands = 100, migrationPercentage = 0.1)
 
     val (result, population) = islandsRunner.run(sc, pc)
 
@@ -49,6 +49,8 @@ object main {
       println("	" + solution.getVariable(0));
       i += 1
     }
+    
+    moeaAdaptor.showPlot(result)
 
     println("population size", population.size)
   }

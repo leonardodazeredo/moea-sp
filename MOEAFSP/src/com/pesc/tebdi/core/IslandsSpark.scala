@@ -56,19 +56,17 @@ class IslandsSpark extends Serializable {
     var numOfMigrations = 0
 
     val iniPopulation = pc.moeaAdaptor.generateRandomPopulation(pc.problem, pc.populationSize)
-    var i = 0
-    val iniPopulationWithId = iniPopulation.map(s => { i += 1; (i, s) })
+
+    val iniPopulationWithId = iniPopulation.map(s => (0, s))
 
     var rdd = sc.parallelize(iniPopulationWithId.to[Seq], numOfIslands)
 
-    while (numOfMigrations < numOfMigrationsMax) {
+    for (i <- 0 to numOfMigrationsMax) {
       rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
 
       rdd = rdd.mapPartitionsWithIndex((index, iter) => setNewIslands(pc, index, iter))
 
       rdd = rdd.partitionBy(new FollowKeyPartitioner(numOfIslands))
-
-      numOfMigrations += 1
     }
 
     val final_population = rdd.collect.toList.map(ind => ind._2)

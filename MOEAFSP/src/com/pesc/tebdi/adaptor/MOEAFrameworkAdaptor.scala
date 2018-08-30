@@ -10,7 +10,6 @@ import org.moeaframework.core.EpsilonBoxDominanceArchive
 import org.moeaframework.core.Initialization
 import org.moeaframework.core.NondominatedPopulation
 import org.moeaframework.core.NondominatedSortingPopulation
-import org.moeaframework.core.Population
 import org.moeaframework.core.Problem
 import org.moeaframework.core.Selection
 import org.moeaframework.core.Solution
@@ -35,12 +34,12 @@ class MOEAFrameworkAdaptor extends MOEAAdaptor {
 
     ini.initialize().toList
   }
-  
-  def getNondominatedPopulation(population: Iterable[Solution]): Iterable[Solution] = {
-    
-     val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
 
-     solutions.asScala.toList
+  def getNondominatedPopulation(population: Iterable[Solution]): Iterable[Solution] = {
+
+    val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
+
+    solutions.asScala.toList
   }
 
   def runNSGAII_MasterSlave_Sp(sc: SparkContext, problem: Problem, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
@@ -142,10 +141,13 @@ class MOEAFrameworkAdaptor extends MOEAAdaptor {
 
     (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
   }
-  
-   def showPlot(result: Population) {
+
+  def showPlot(population: Iterable[Solution]) {
+
+    val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
+
     val p = new Plot()
-      .add("NSGAII", result)
+      .add("NSGAII", solutions)
       .show();
   }
 
