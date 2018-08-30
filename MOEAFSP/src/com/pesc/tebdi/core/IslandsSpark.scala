@@ -49,6 +49,17 @@ class IslandsSpark extends Serializable {
     newIndividualArray.toList.iterator
   }
 
+  def getNondominatedPopulationInIsland(pc: OptimizationContext, islandId: Int, iter: Iterator[Individual]): Iterator[Individual] = {
+
+    var population = iter.toList.map(ind => ind._2)
+
+    population = pc.moeaAdaptor.getNondominatedPopulation(population).toList
+    
+    val individual = population.map(s => (islandId, s))
+
+    individual.iterator
+  }
+
   def run(sc: SparkContext, pc: OptimizationContext): (Iterable[Solution], Iterable[Solution]) = {
 
     implicit def arrayToList[A](a: Array[A]) = a.toList
@@ -68,6 +79,8 @@ class IslandsSpark extends Serializable {
 
       rdd = rdd.partitionBy(new FollowKeyPartitioner(numOfIslands))
     }
+
+    rdd = rdd.mapPartitionsWithIndex((index, iter) => getNondominatedPopulationInIsland(pc, index, iter))
 
     val final_population = rdd.collect.toList.map(ind => ind._2)
 
