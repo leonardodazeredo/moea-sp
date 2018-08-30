@@ -1,11 +1,10 @@
 package com.pesc.tebdi.adaptor
 
-import scala.collection.JavaConverters._
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+import scala.collection.JavaConverters.seqAsJavaListConverter
 
 import org.apache.spark.SparkContext
 import org.moeaframework.algorithm.NSGAII
-import org.moeaframework.analysis.plot.Plot
 import org.moeaframework.core.EpsilonBoxDominanceArchive
 import org.moeaframework.core.Initialization
 import org.moeaframework.core.NondominatedSortingPopulation
@@ -17,24 +16,24 @@ import org.moeaframework.core.comparator.ChainedComparator
 import org.moeaframework.core.comparator.CrowdingComparator
 import org.moeaframework.core.comparator.ParetoDominanceComparator
 import org.moeaframework.core.operator.GAVariation
+import org.moeaframework.core.operator.InjectedInitialization
 import org.moeaframework.core.operator.RandomInitialization
 import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
-import org.moeaframework.core.operator.InjectedInitialization
 
 class MOEAFrameworkAdaptor {
 
   def generateRandomPopulation(problem: Problem, size: Int): Iterable[Solution] = {
     implicit def arrayToList[A](a: Array[A]) = a.toList
-    
+
     val ini = new RandomInitialization(problem, size)
     //    ini.initialize().asInstanceOf[List[Solution]]
-    
+
     ini.initialize().toList
   }
 
-  def runNSGAII_SP(sc: SparkContext, problem: Problem, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterable[Solution], Iterable[Solution]) = {
+  def runNSGAII_MasterSlave_Sp(sc: SparkContext, problem: Problem, iniPopulationIter: Iterator[Solution] = Iterator[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
 
     class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
       selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
@@ -46,7 +45,7 @@ class MOEAFrameworkAdaptor {
         val p = problem;
 
         val solutionScalaList = solutions.asScala
-        val solutionsRDD = sc.parallelize(solutionScalaList.to[collection.immutable.Seq])
+        val solutionsRDD = sc.parallelize(solutionScalaList.to[Seq])
         val rdd = solutionsRDD.map(s => { p.evaluate(s); s })
         val ss = rdd.collect
 
@@ -62,6 +61,8 @@ class MOEAFrameworkAdaptor {
         }
       }
     }
+
+    val iniPopulation = iniPopulationIter.toList
 
     if (iniPopulation.isEmpty) {
       val iniPopulation = generateRandomPopulation(problem, 1000)
@@ -95,11 +96,45 @@ class MOEAFrameworkAdaptor {
       algorithm.step();
     }
 
-    val p = new Plot()
-      .add("NSGAII", algorithm.getResult)
-      .show();
+    (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
+  }
 
-    (algorithm.getResult.asScala, algorithm.getPopulation.asScala)
+  def runNSGAII(problem: Problem, iniPopulationIter: Iterator[Solution] = Iterator[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
+
+    val iniPopulation = iniPopulationIter.toList
+
+    if (iniPopulation.isEmpty) {
+      val iniPopulation = generateRandomPopulation(problem, 1000)
+    }
+
+    val initialization = new InjectedInitialization(
+      problem,
+      iniPopulation.size,
+      iniPopulation.asInstanceOf[List[Solution]].asJava);
+
+    val selection = new TournamentSelection(
+      2,
+      new ChainedComparator(
+        new ParetoDominanceComparator(),
+        new CrowdingComparator()));
+
+    val variation = new GAVariation(
+      new SBX(1.0, 25.0),
+      new PM(1.0 / problem.getNumberOfVariables(), 30.0));
+
+    val algorithm = new NSGAII(
+      problem,
+      new NondominatedSortingPopulation(),
+      null, // no archive
+      selection,
+      variation,
+      initialization);
+
+    while (algorithm.getNumberOfEvaluations < 5000) {
+      algorithm.step();
+    }
+
+    (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
   }
 
 }

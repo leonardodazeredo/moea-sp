@@ -6,38 +6,65 @@ import org.apache.spark.SparkContext
 import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
 
 import chapter.KnapsackProblem
+import com.pesc.tebdi.core.IslandsSpark
 
-object main extends App {
+object main {
 
   implicit def arrayToList[A](a: Array[A]) = a.toList
 
-  //Start the Spark context
-  val conf = new SparkConf()
-    .setAppName("main")
-    .setMaster("local")
+  def main(args: Array[String]): Unit = {
 
-  val sc = new SparkContext(conf)
+    val conf = new SparkConf()
+      .setAppName("main")
+      .setMaster("local")
 
-  val runner = new MOEAFrameworkAdaptor()
+    val sc = new SparkContext(conf)
 
-  val problem = new KnapsackProblem();
+    //    test_masterSlave(sc)
+    test_islands(sc)
+  }
 
-  val iniPopulation = runner.generateRandomPopulation(problem, 5000)
+  def test_islands(sc: SparkContext) {
 
-  val (result, population) = runner.runNSGAII_SP(sc, problem, iniPopulation)
+    val islandsRunner = new IslandsSpark()
 
-  println(population.size)
+    val (result, population) = islandsRunner.run(sc)
 
-  var i = 1
-  for (solution <- result) {
+    var i = 1
+    for (solution <- result) {
 
-    var objectives = solution.getObjectives();
+      var objectives = solution.getObjectives();
 
-    println("Solution " + i + ":");
-    //      println("	" + objectives(0));
-    //      println("	" + objectives(1));
-    println("	" + solution.getVariable(0));
-    i += 1
+      println("Solution " + i + ":");
+      println("	" + objectives(0));
+      println("	" + objectives(1));
+      println("	" + solution.getVariable(0));
+      i += 1
+    }
+  }
+
+  def test_masterSlave(sc: SparkContext) {
+    val runner = new MOEAFrameworkAdaptor()
+
+    val problem = new KnapsackProblem();
+
+    val iniPopulation = runner.generateRandomPopulation(problem, 5555)
+
+    val (result, population) = runner.runNSGAII_MasterSlave_Sp(sc, problem, iniPopulation.iterator)
+
+    println(population.size)
+
+    var i = 1
+    for (solution <- result) {
+
+      var objectives = solution.getObjectives();
+
+      println("Solution " + i + ":");
+      //      println("	" + objectives(0));
+      //      println("	" + objectives(1));
+      println("	" + solution.getVariable(0));
+      i += 1
+    }
   }
 
 }
