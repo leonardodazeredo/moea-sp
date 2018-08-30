@@ -5,7 +5,6 @@ import org.apache.spark.SparkContext
 
 import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
 import com.pesc.tebdi.core.IslandsSpark
-
 import com.pesc.tebdi.core.OptimizationContext
 
 import chapter.KnapsackProblem
@@ -35,10 +34,11 @@ object main {
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
     val pc = OptimizationContext(moeaAdaptor, problem,
-      populationSize = 5555,
+      totalPopulationSize = 50000,
       numOfIslands = 100,
-      migrationPercentage = 0.1,
-      numOfMigrations = 4)
+      migrationSizeInIslandPercentage = 0.1,
+      numOfMigrations = 4,
+      numberOfEvaluationsInIslandRatio = 10)
 
     val (result, population) = islandsRunner.run(sc, pc)
 
@@ -50,9 +50,9 @@ object main {
       println("	" + solution.getVariable(0));
     }
 
-    moeaAdaptor.showPlot(result)
+    moeaAdaptor.showPlot("NSGAII", result)
 
-    println("population size", population.size)
+    println("Final population size: " + population.size)
   }
 
   def test_masterSlave(sc: SparkContext) {
@@ -60,9 +60,16 @@ object main {
 
     val problem = new KnapsackProblem();
 
-    val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, 5555)
+    val pc = OptimizationContext(moeaAdaptor, problem,
+      totalPopulationSize = 50000,
+      numOfIslands = 100,
+      migrationSizeInIslandPercentage = 0.1,
+      numOfMigrations = 4,
+      numberOfEvaluationsInIslandRatio = 10)
 
-    val (result, population) = moeaAdaptor.runNSGAII_MasterSlave_Sp(sc, problem, iniPopulation)
+    val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, pc.totalPopulationSize)
+
+    val (result, population) = moeaAdaptor.runNSGAII_MasterSlave_Sp(sc, pc, iniPopulation)
 
     for ((solution, i) <- result.toList.zipWithIndex) {
       var objectives = solution.getObjectives();
@@ -72,9 +79,9 @@ object main {
       println("	" + solution.getVariable(0));
     }
 
-    moeaAdaptor.showPlot(result.toList)
+    moeaAdaptor.showPlot("NSGAII", result.toList)
 
-    println("population size", population.size)
+    println("Final population size: " + population.size)
   }
 
 }

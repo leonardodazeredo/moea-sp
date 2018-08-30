@@ -14,7 +14,7 @@ class IslandsSpark extends Serializable {
 
     val parent_population = iter.toList.map(ind => ind._2)
 
-    val (result, descendant_population) = pc.moeaAdaptor.runNSGAII(pc.problem, parent_population)
+    val (result, descendant_population) = pc.moeaAdaptor.runNSGAII(pc, parent_population)
 
     descendant_population.map(s => (islandId, s))
   }
@@ -25,7 +25,7 @@ class IslandsSpark extends Serializable {
 
     val islandsIdsList = List.range(0, pc.numOfIslands).filterNot(i => i == islandId)
 
-    val indexesList = Random.shuffle(List.range(0, individualList.size)).take((pc.migrationPercentage * individualList.size).toInt)
+    val indexesList = Random.shuffle(List.range(0, individualList.size)).take((pc.migrationSizeInIslandPercentage * individualList.size).toInt)
 
     val random = new Random()
 
@@ -54,9 +54,7 @@ class IslandsSpark extends Serializable {
 
     implicit def arrayToList[A](a: Array[A]) = a.toList
 
-    var numOfMigrations = 0
-
-    val iniPopulation = pc.moeaAdaptor.generateRandomPopulation(pc.problem, pc.populationSize)
+    val iniPopulation = pc.moeaAdaptor.generateRandomPopulation(pc.problem, pc.totalPopulationSize)
 
     val iniPopulationWithId = iniPopulation.map(s => (0, s))
 
