@@ -4,9 +4,9 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
 import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
+import com.pesc.tebdi.core.IslandsSpark
 
 import chapter.KnapsackProblem
-import com.pesc.tebdi.core.IslandsSpark
 
 object main {
 
@@ -41,6 +41,8 @@ object main {
       println("	" + solution.getVariable(0));
       i += 1
     }
+
+    println("population size", population.size)
   }
 
   def test_masterSlave(sc: SparkContext) {

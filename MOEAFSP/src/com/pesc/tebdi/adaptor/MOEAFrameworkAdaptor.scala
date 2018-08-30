@@ -99,9 +99,7 @@ class MOEAFrameworkAdaptor {
     (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
   }
 
-  def runNSGAII(problem: Problem, iniPopulationIter: Iterator[Solution] = Iterator[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
-
-    val iniPopulation = iniPopulationIter.toList
+  def runNSGAII(problem: Problem, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
 
     if (iniPopulation.isEmpty) {
       val iniPopulation = generateRandomPopulation(problem, 1000)
