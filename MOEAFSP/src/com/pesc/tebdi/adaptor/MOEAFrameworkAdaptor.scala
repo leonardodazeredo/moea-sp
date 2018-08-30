@@ -5,9 +5,12 @@ import scala.collection.JavaConverters.seqAsJavaListConverter
 
 import org.apache.spark.SparkContext
 import org.moeaframework.algorithm.NSGAII
+import org.moeaframework.analysis.plot.Plot
 import org.moeaframework.core.EpsilonBoxDominanceArchive
 import org.moeaframework.core.Initialization
+import org.moeaframework.core.NondominatedPopulation
 import org.moeaframework.core.NondominatedSortingPopulation
+import org.moeaframework.core.Population
 import org.moeaframework.core.Problem
 import org.moeaframework.core.Selection
 import org.moeaframework.core.Solution
@@ -22,7 +25,7 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
-class MOEAFrameworkAdaptor {
+class MOEAFrameworkAdaptor extends MOEAAdaptor {
 
   def generateRandomPopulation(problem: Problem, size: Int): Iterable[Solution] = {
     implicit def arrayToList[A](a: Array[A]) = a.toList
@@ -32,8 +35,15 @@ class MOEAFrameworkAdaptor {
 
     ini.initialize().toList
   }
+  
+  def getNondominatedPopulation(population: Iterable[Solution]): Iterable[Solution] = {
+    
+     val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
 
-  def runNSGAII_MasterSlave_Sp(sc: SparkContext, problem: Problem, iniPopulationIter: Iterator[Solution] = Iterator[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
+     solutions.asScala.toList
+  }
+
+  def runNSGAII_MasterSlave_Sp(sc: SparkContext, problem: Problem, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
 
     class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
       selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
@@ -61,8 +71,6 @@ class MOEAFrameworkAdaptor {
         }
       }
     }
-
-    val iniPopulation = iniPopulationIter.toList
 
     if (iniPopulation.isEmpty) {
       val iniPopulation = generateRandomPopulation(problem, 1000)
@@ -133,6 +141,12 @@ class MOEAFrameworkAdaptor {
     }
 
     (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
+  }
+  
+   def showPlot(result: Population) {
+    val p = new Plot()
+      .add("NSGAII", result)
+      .show();
   }
 
 }

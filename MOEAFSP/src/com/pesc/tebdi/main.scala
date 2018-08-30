@@ -6,6 +6,8 @@ import org.apache.spark.SparkContext
 import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
 import com.pesc.tebdi.core.IslandsSpark
 
+import com.pesc.tebdi.core.OptimizationContext
+
 import chapter.KnapsackProblem
 
 object main {
@@ -28,7 +30,13 @@ object main {
 
     val islandsRunner = new IslandsSpark()
 
-    val (result, population) = islandsRunner.run(sc)
+    val problem = new KnapsackProblem();
+
+    val moeaAdaptor = new MOEAFrameworkAdaptor()
+
+    val pc = OptimizationContext(moeaAdaptor, problem, populationSize = 5000, numOfIslands = 100, migrationPercentage = 0.1)
+
+    val (result, population) = islandsRunner.run(sc, pc)
 
     var i = 1
     for (solution <- result) {
@@ -52,7 +60,7 @@ object main {
 
     val iniPopulation = runner.generateRandomPopulation(problem, 5555)
 
-    val (result, population) = runner.runNSGAII_MasterSlave_Sp(sc, problem, iniPopulation.iterator)
+    val (result, population) = runner.runNSGAII_MasterSlave_Sp(sc, problem, iniPopulation)
 
     println(population.size)
 
