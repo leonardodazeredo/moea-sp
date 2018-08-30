@@ -1,5 +1,6 @@
 package com.pesc.tebdi.adaptor
 
+import org.apache.spark.SparkContext
 import org.moeaframework.core.Problem
 import org.moeaframework.core.Solution
 
@@ -13,4 +14,7 @@ trait MOEAAdaptor extends Serializable {
 
   def getNondominatedPopulation(population: Iterable[Solution]): Iterable[Solution]
 
+  def runNSGAII_MasterSlave_Sp(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterator[Solution], Iterator[Solution])
+
+  def showPlot(algorithm: String, population: Iterable[Solution])
 }
