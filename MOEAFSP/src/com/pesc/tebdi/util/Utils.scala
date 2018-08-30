@@ -2,6 +2,7 @@ package com.pesc.tebdi.util
 
 import org.moeaframework.analysis.plot.Plot
 import org.moeaframework.core.NondominatedPopulation
+import scala.util.Random
 
 object Utils {
 
@@ -10,5 +11,8 @@ object Utils {
       .add("NSGAII", result)
       .show();
   }
+  
+  def getRandomElement(list: Seq[Int], random: Random): Int = 
+    list(random.nextInt(list.length))
 
 }
