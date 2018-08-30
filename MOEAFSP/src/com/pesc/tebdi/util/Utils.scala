@@ -7,7 +7,6 @@ import org.moeaframework.core.Population
 
 object Utils {
 
-  def getRandomElement(list: Seq[Int], random: Random): Int =
-    list(random.nextInt(list.length))
+  def getRandomElement(list: Seq[Int], random: Random): Int = list(random.nextInt(list.length))
 
 }
