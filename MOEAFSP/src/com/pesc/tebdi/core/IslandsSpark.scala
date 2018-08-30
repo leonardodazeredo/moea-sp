@@ -54,7 +54,7 @@ class IslandsSpark extends Serializable {
     var population = iter.toList.map(ind => ind._2)
 
     population = pc.moeaAdaptor.getNondominatedPopulation(population).toList
-    
+
     val individual = population.map(s => (islandId, s))
 
     individual.iterator
@@ -72,13 +72,15 @@ class IslandsSpark extends Serializable {
 
     var rdd = sc.parallelize(iniPopulationWithId.to[Seq], numOfIslands)
 
-    for (i <- 0 to numOfMigrationsMax) {
+    for (i <- 0 to numOfMigrationsMax - 1) {
       rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
-
       rdd = rdd.mapPartitionsWithIndex((index, iter) => setNewIslands(pc, index, iter))
 
       rdd = rdd.partitionBy(new FollowKeyPartitioner(numOfIslands))
     }
+
+    rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
+    rdd = rdd.mapPartitionsWithIndex((index, iter) => setNewIslands(pc, index, iter))
 
     rdd = rdd.mapPartitionsWithIndex((index, iter) => getNondominatedPopulationInIsland(pc, index, iter))
 

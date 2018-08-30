@@ -30,7 +30,6 @@ class MOEAFrameworkAdaptor extends MOEAAdaptor {
     implicit def arrayToList[A](a: Array[A]) = a.toList
 
     val ini = new RandomInitialization(problem, size)
-    //    ini.initialize().asInstanceOf[List[Solution]]
 
     ini.initialize().toList
   }
