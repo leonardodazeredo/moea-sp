@@ -10,12 +10,6 @@ import com.pesc.tebdi.util.Utils
 
 class IslandsSpark extends Serializable {
 
-  val numOfIslands = 100
-
-  val numOfMigrationsMax = 4
-
-  val migrationPercentage = 0.1
-
   def inIslandRun(pc: OptimizationContext, islandId: Int, iter: Iterator[Individual]): Iterator[Individual] = {
 
     val parent_population = iter.toList.map(ind => ind._2)
@@ -42,10 +36,6 @@ class IslandsSpark extends Serializable {
       newIndividualArray(i) = (newIslandId, individualList(i)._2)
     }
 
-    //    for ((e, i) <- newIndividualArray.toList.zipWithIndex){
-    //      println(e)
-    //    }
-
     newIndividualArray.toList.iterator
   }
 
@@ -70,17 +60,17 @@ class IslandsSpark extends Serializable {
 
     val iniPopulationWithId = iniPopulation.map(s => (0, s))
 
-    var rdd = sc.parallelize(iniPopulationWithId.to[Seq], numOfIslands)
+    var rdd = sc.parallelize(iniPopulationWithId.to[Seq], pc.numOfIslands)
 
-    for (i <- 0 to numOfMigrationsMax - 1) {
+    for (i <- 1 to pc.numOfMigrations) {
       rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
+      
       rdd = rdd.mapPartitionsWithIndex((index, iter) => setNewIslands(pc, index, iter))
-
-      rdd = rdd.partitionBy(new FollowKeyPartitioner(numOfIslands))
+      
+      rdd = rdd.partitionBy(new FollowKeyPartitioner(pc.numOfIslands))
     }
 
     rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
-    rdd = rdd.mapPartitionsWithIndex((index, iter) => setNewIslands(pc, index, iter))
 
     rdd = rdd.mapPartitionsWithIndex((index, iter) => getNondominatedPopulationInIsland(pc, index, iter))
 

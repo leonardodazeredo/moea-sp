@@ -34,49 +34,47 @@ object main {
 
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
-    val pc = OptimizationContext(moeaAdaptor, problem, populationSize = 5555, numOfIslands = 100, migrationPercentage = 0.1)
+    val pc = OptimizationContext(moeaAdaptor, problem,
+      populationSize = 5555,
+      numOfIslands = 100,
+      migrationPercentage = 0.1,
+      numOfMigrations = 4)
 
     val (result, population) = islandsRunner.run(sc, pc)
 
-    var i = 1
-    for (solution <- result) {
-
+    for ((solution, i) <- result.toList.zipWithIndex) {
       var objectives = solution.getObjectives();
-
       println("Solution " + i + ":");
       println("	" + objectives(0));
       println("	" + objectives(1));
       println("	" + solution.getVariable(0));
-      i += 1
     }
-    
+
     moeaAdaptor.showPlot(result)
 
     println("population size", population.size)
   }
 
   def test_masterSlave(sc: SparkContext) {
-    val runner = new MOEAFrameworkAdaptor()
+    val moeaAdaptor = new MOEAFrameworkAdaptor()
 
     val problem = new KnapsackProblem();
 
-    val iniPopulation = runner.generateRandomPopulation(problem, 5555)
+    val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, 5555)
 
-    val (result, population) = runner.runNSGAII_MasterSlave_Sp(sc, problem, iniPopulation)
+    val (result, population) = moeaAdaptor.runNSGAII_MasterSlave_Sp(sc, problem, iniPopulation)
 
-    println(population.size)
-
-    var i = 1
-    for (solution <- result) {
-
+    for ((solution, i) <- result.toList.zipWithIndex) {
       var objectives = solution.getObjectives();
-
       println("Solution " + i + ":");
-      //      println("	" + objectives(0));
-      //      println("	" + objectives(1));
+      println("	" + objectives(0));
+      println("	" + objectives(1));
       println("	" + solution.getVariable(0));
-      i += 1
     }
+
+    moeaAdaptor.showPlot(result.toList)
+
+    println("population size", population.size)
   }
 
 }

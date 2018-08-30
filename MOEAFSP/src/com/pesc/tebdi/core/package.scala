@@ -7,5 +7,11 @@ import com.pesc.tebdi.adaptor.MOEAAdaptor
 package object core {
   type Individual = (Int, Solution)
 
-  case class OptimizationContext(moeaAdaptor: MOEAAdaptor, problem: Problem, populationSize: Int, numOfIslands: Int, migrationPercentage: Double)
+  case class OptimizationContext(
+    moeaAdaptor: MOEAAdaptor,
+    problem: Problem,
+    populationSize: Int,
+    numOfIslands: Int,
+    migrationPercentage: Double,
+    numOfMigrations: Int)
 }
