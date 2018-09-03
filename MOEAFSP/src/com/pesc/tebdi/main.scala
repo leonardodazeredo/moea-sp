@@ -27,8 +27,6 @@ object main {
 
   def test_islands(sc: SparkContext) {
 
-    val islandsRunner = new IslandsSpark()
-
     val problem = new KnapsackProblem();
 
     val moeaAdaptor = new MOEAFrameworkAdaptor()
@@ -40,7 +38,7 @@ object main {
       numOfMigrations = 4,
       numberOfEvaluationsInIslandRatio = 10)
 
-    val (result, population) = islandsRunner.runSingleJob(sc, pc)
+    val (result, population) = IslandsSpark.runSingleJob(sc, pc)
 
     for ((solution, i) <- result.toList.zipWithIndex) {
       var objectives = solution.getObjectives();

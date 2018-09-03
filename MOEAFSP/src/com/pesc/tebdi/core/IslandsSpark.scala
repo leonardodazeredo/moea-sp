@@ -10,6 +10,37 @@ import com.pesc.tebdi.util.Utils
 
 class IslandsSpark extends Serializable {
 
+}
+
+object IslandsSpark extends Serializable {
+
+  def runSingleJob(sc: SparkContext, pc: OptimizationContext): (Iterable[Solution], Iterable[Solution]) = {
+
+    implicit def arrayToList[A](a: Array[A]) = a.toList
+
+    val iniPopulation = pc.moeaAdaptor.generateRandomPopulation(pc.problem, pc.totalPopulationSize)
+
+    val iniPopulationWithId = iniPopulation.map(s => (0, s))
+
+    var rdd = sc.parallelize(iniPopulationWithId.to[Seq], pc.numOfIslands)
+
+    for (i <- 1 to pc.numOfMigrations) {
+      rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
+
+      rdd = rdd.mapPartitionsWithIndex((index, iter) => setNewIslands(pc, index, iter))
+
+      rdd = rdd.partitionBy(new FollowKeyPartitioner(pc.numOfIslands))
+    }
+
+    rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
+
+    rdd = rdd.mapPartitionsWithIndex((index, iter) => getNondominatedPopulationInIsland(pc, index, iter))
+
+    val final_population = rdd.collect.toList.map(ind => ind._2)
+
+    (pc.moeaAdaptor.getNondominatedPopulation(final_population), final_population)
+  }
+
   def inIslandRun(pc: OptimizationContext, islandId: Int, iter: Iterator[Individual]): Iterator[Individual] = {
 
     val parent_population = iter.toList.map(ind => ind._2)
@@ -48,33 +79,6 @@ class IslandsSpark extends Serializable {
     val individual = population.map(s => (islandId, s))
 
     individual.iterator
-  }
-
-  def runSingleJob(sc: SparkContext, pc: OptimizationContext): (Iterable[Solution], Iterable[Solution]) = {
-
-    implicit def arrayToList[A](a: Array[A]) = a.toList
-
-    val iniPopulation = pc.moeaAdaptor.generateRandomPopulation(pc.problem, pc.totalPopulationSize)
-
-    val iniPopulationWithId = iniPopulation.map(s => (0, s))
-
-    var rdd = sc.parallelize(iniPopulationWithId.to[Seq], pc.numOfIslands)
-
-    for (i <- 1 to pc.numOfMigrations) {
-      rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
-      
-      rdd = rdd.mapPartitionsWithIndex((index, iter) => setNewIslands(pc, index, iter))
-      
-      rdd = rdd.partitionBy(new FollowKeyPartitioner(pc.numOfIslands))
-    }
-
-    rdd = rdd.mapPartitionsWithIndex((index, iter) => inIslandRun(pc, index, iter))
-
-    rdd = rdd.mapPartitionsWithIndex((index, iter) => getNondominatedPopulationInIsland(pc, index, iter))
-
-    val final_population = rdd.collect.toList.map(ind => ind._2)
-
-    (pc.moeaAdaptor.getNondominatedPopulation(final_population), final_population)
   }
 
 }
