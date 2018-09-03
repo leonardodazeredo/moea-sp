@@ -10,9 +10,7 @@ import org.moeaframework.core.EpsilonBoxDominanceArchive
 import org.moeaframework.core.Initialization
 import org.moeaframework.core.NondominatedPopulation
 import org.moeaframework.core.NondominatedSortingPopulation
-import org.moeaframework.core.Problem
 import org.moeaframework.core.Selection
-import org.moeaframework.core.Solution
 import org.moeaframework.core.Variation
 import org.moeaframework.core.comparator.ChainedComparator
 import org.moeaframework.core.comparator.CrowdingComparator
@@ -24,26 +22,31 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
+import com.pesc.tebdi.core.MOEASpSolution
+import com.pesc.tebdi.core.MOEASpProblem
+
 import com.pesc.tebdi.core.OptimizationContext
+import org.moeaframework.core.Problem
+import org.moeaframework.core.Solution
 
 class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
-  def generateRandomPopulation(problem: Problem, size: Int): Iterable[Solution] = {
+  def generateRandomPopulation(problem: MOEASpProblem, size: Int): Iterable[MOEASpSolution] = {
     implicit def arrayToList[A](a: Array[A]) = a.toList
-
-    val ini = new RandomInitialization(problem, size)
+    
+    val ini = new RandomInitialization(problem.asInstanceOf[Problem], size)
 
     ini.initialize().toList
   }
 
-  def getNondominatedPopulation(population: Iterable[Solution]): Iterable[Solution] = {
+  def getNondominatedPopulation(population: Iterable[MOEASpSolution]): Iterable[MOEASpSolution] = {
 
     val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
 
     solutions.asScala.toList
   }
 
-  def runNSGAII_MasterSlave_Sp(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
+  def runNSGAII_MasterSlave_Sp(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
 
     class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
       selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
@@ -52,7 +55,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
         implicit def arrayToList[A](a: Array[A]) = a.toList
 
-        val p = problem;
+        val p = problem
 
         val solutionScalaList = solutions.asScala
         val solutionsRDD = sc.parallelize(solutionScalaList.to[Seq])
@@ -77,7 +80,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     }
 
     val initialization = new InjectedInitialization(
-      pc.problem,
+      pc.problem.asInstanceOf[Problem],
       iniPopulation.size,
       iniPopulation.asInstanceOf[List[Solution]].asJava);
 
@@ -89,11 +92,11 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
     val variation = new GAVariation(
       new SBX(1.0, 25.0),
-      new PM(1.0 / pc.problem.getNumberOfVariables(), 30.0));
+      new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
 
     val algorithm = new NSGAII_SP(
       sc,
-      pc.problem,
+      pc.problem.asInstanceOf[Problem],
       new NondominatedSortingPopulation(),
       null, // no archive
       selection,
@@ -107,14 +110,14 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
   }
 
-  def runNSGAII(pc: OptimizationContext, iniPopulation: Iterable[Solution] = List[Solution]()): (Iterator[Solution], Iterator[Solution]) = {
+  def runNSGAII(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
 
     if (iniPopulation.isEmpty) {
       val iniPopulation = generateRandomPopulation(pc.problem, 1000)
     }
 
     val initialization = new InjectedInitialization(
-      pc.problem,
+      pc.problem.asInstanceOf[Problem],
       iniPopulation.size,
       iniPopulation.asInstanceOf[List[Solution]].asJava);
 
@@ -126,10 +129,10 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
     val variation = new GAVariation(
       new SBX(1.0, 25.0),
-      new PM(1.0 / pc.problem.getNumberOfVariables(), 30.0));
+      new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
 
     val algorithm = new NSGAII(
-      pc.problem,
+      pc.problem.asInstanceOf[Problem],
       new NondominatedSortingPopulation(),
       null, // no archive
       selection,
@@ -145,7 +148,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
   }
 
-  def showPlot(algorithm: String, population: Iterable[Solution]) {
+  def showPlot(algorithm: String, population: Iterable[MOEASpSolution]) {
 
     val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
 

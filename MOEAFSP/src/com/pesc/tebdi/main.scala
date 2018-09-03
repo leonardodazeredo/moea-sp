@@ -2,6 +2,7 @@ package com.pesc.tebdi
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import org.moeaframework.core.Solution
 
 import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
 import com.pesc.tebdi.core.IslandsSpark
@@ -41,11 +42,12 @@ object main {
     val (result, population) = IslandsSpark.runSingleJob(sc, pc)
 
     for ((solution, i) <- result.toList.zipWithIndex) {
-      var objectives = solution.getObjectives();
+      val s = solution.asInstanceOf[Solution]
+      var objectives = s.getObjectives();
       println("Solution " + i + ":");
       println("	" + objectives(0));
       println("	" + objectives(1));
-      println("	" + solution.getVariable(0));
+      println("	" + s.getVariable(0));
     }
 
     moeaAdaptor.showPlot("NSGAII", result)
@@ -70,11 +72,13 @@ object main {
     val (result, population) = moeaAdaptor.runNSGAII_MasterSlave_Sp(sc, pc, iniPopulation)
 
     for ((solution, i) <- result.toList.zipWithIndex) {
-      var objectives = solution.getObjectives();
+      val s = solution.asInstanceOf[Solution]
+
+      var objectives = s.getObjectives();
       println("Solution " + i + ":");
       println("	" + objectives(0));
       println("	" + objectives(1));
-      println("	" + solution.getVariable(0));
+      println("	" + s.getVariable(0));
     }
 
     moeaAdaptor.showPlot("NSGAII", result.toList)

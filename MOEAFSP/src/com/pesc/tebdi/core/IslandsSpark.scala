@@ -3,7 +3,6 @@ package com.pesc.tebdi.core
 import scala.util.Random
 
 import org.apache.spark.SparkContext
-import org.moeaframework.core.Solution
 
 import com.pesc.tebdi.partitioner.FollowKeyPartitioner
 import com.pesc.tebdi.util.Utils
@@ -14,7 +13,7 @@ class IslandsSpark extends Serializable {
 
 object IslandsSpark extends Serializable {
 
-  def runSingleJob(sc: SparkContext, pc: OptimizationContext): (Iterable[Solution], Iterable[Solution]) = {
+  def runSingleJob(sc: SparkContext, pc: OptimizationContext): (Iterable[MOEASpSolution], Iterable[MOEASpSolution]) = {
 
     implicit def arrayToList[A](a: Array[A]) = a.toList
 
