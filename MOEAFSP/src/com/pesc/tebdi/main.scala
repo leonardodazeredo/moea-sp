@@ -40,7 +40,7 @@ object main {
       numOfMigrations = 4,
       numberOfEvaluationsInIslandRatio = 10)
 
-    val (result, population) = islandsRunner.run(sc, pc)
+    val (result, population) = islandsRunner.runSingleJob(sc, pc)
 
     for ((solution, i) <- result.toList.zipWithIndex) {
       var objectives = solution.getObjectives();

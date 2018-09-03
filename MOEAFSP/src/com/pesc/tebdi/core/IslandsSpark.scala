@@ -50,7 +50,7 @@ class IslandsSpark extends Serializable {
     individual.iterator
   }
 
-  def run(sc: SparkContext, pc: OptimizationContext): (Iterable[Solution], Iterable[Solution]) = {
+  def runSingleJob(sc: SparkContext, pc: OptimizationContext): (Iterable[Solution], Iterable[Solution]) = {
 
     implicit def arrayToList[A](a: Array[A]) = a.toList
 
