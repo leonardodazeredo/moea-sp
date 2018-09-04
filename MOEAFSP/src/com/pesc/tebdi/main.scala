@@ -22,11 +22,11 @@ object main {
 
     val sc = new SparkContext(conf)
 
-    //    test_masterSlave(sc)
-    test_islands(sc)
+    //    test_master_slave_eval(sc)
+    test_islands_single(sc)
   }
 
-  def test_islands(sc: SparkContext) {
+  def test_islands_single(sc: SparkContext) {
 
     val problem = new KnapsackProblem();
 
@@ -55,7 +55,7 @@ object main {
     println("Final population size: " + population.size)
   }
 
-  def test_masterSlave(sc: SparkContext) {
+  def test_master_slave_eval(sc: SparkContext) {
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
     val problem = new KnapsackProblem();

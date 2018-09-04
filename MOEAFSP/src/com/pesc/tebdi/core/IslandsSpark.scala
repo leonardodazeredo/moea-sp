@@ -1,5 +1,6 @@
 package com.pesc.tebdi.core
 
+import scala.collection.mutable.HashMap
 import scala.util.Random
 
 import org.apache.spark.SparkContext
@@ -7,7 +8,25 @@ import org.apache.spark.SparkContext
 import com.pesc.tebdi.partitioner.FollowKeyPartitioner
 import com.pesc.tebdi.util.Utils
 
-class IslandsSpark extends Serializable {
+class IslandsSpark(sparkContext: SparkContext, optimizationContext: OptimizationContext) extends Serializable {
+
+  private val nondominatedPopulationPerMigrationMap = new HashMap[Int, MOEASpSolution]
+
+  private var currentMigration = 0
+  
+  private var state = 0
+
+  def getNondominatedPopulation(migrantion: Int) {
+
+  }
+
+  def runSequentialJobs() {
+
+  }
+
+  def runSingleJob() {
+    IslandsSpark.runSingleJob(sparkContext, optimizationContext)
+  }
 
 }
 
