@@ -9,6 +9,8 @@ import com.pesc.tebdi.core.IslandsSpark
 import com.pesc.tebdi.core.OptimizationContext
 
 import chapter.KnapsackProblem
+import com.pesc.tebdi.core.IslandsSparkSequentialRunner
+import com.pesc.tebdi.core.IslandsSparkSingleRunner
 
 object main {
 
@@ -23,7 +25,38 @@ object main {
     val sc = new SparkContext(conf)
 
     //    test_master_slave_eval(sc)
-    test_islands_single(sc)
+    //    test_islands_single(sc)
+    test_islands_sequential(sc)
+
+  }
+
+  def test_islands_sequential(sc: SparkContext) {
+
+    val problem = new KnapsackProblem();
+
+    val moeaAdaptor = new MOEAFrameworkAdaptor()
+
+    val oc = OptimizationContext(moeaAdaptor, problem,
+      totalPopulationSize = 50000,
+      numOfIslands = 100,
+      migrationSizeInIslandPercentage = 0.1,
+      numOfMigrations = 4,
+      numberOfEvaluationsInIslandRatio = 10)
+
+    val (result, population) = (new IslandsSparkSequentialRunner(sc, oc)).run()
+
+    for ((solution, i) <- result.toList.zipWithIndex) {
+      val s = solution.asInstanceOf[Solution]
+      var objectives = s.getObjectives();
+      println("Solution " + i + ":");
+      println("	" + objectives(0));
+      println("	" + objectives(1));
+      println("	" + s.getVariable(0));
+    }
+
+    moeaAdaptor.showPlot("NSGAII", result)
+
+    println("Final population size: " + population.size)
   }
 
   def test_islands_single(sc: SparkContext) {
@@ -32,14 +65,14 @@ object main {
 
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
-    val pc = OptimizationContext(moeaAdaptor, problem,
+    val oc = OptimizationContext(moeaAdaptor, problem,
       totalPopulationSize = 50000,
       numOfIslands = 100,
       migrationSizeInIslandPercentage = 0.1,
       numOfMigrations = 4,
       numberOfEvaluationsInIslandRatio = 10)
 
-    val (result, population) = IslandsSpark.runSingleJob(sc, pc)
+    val (result, population) = (new IslandsSparkSingleRunner(sc, oc)).run()
 
     for ((solution, i) <- result.toList.zipWithIndex) {
       val s = solution.asInstanceOf[Solution]
