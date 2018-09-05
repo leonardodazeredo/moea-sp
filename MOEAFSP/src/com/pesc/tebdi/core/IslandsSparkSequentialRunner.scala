@@ -1,84 +1,113 @@
 package com.pesc.tebdi.core
 
-import scala.collection.mutable.HashMap
+import java.util.ArrayList
+
+import scala.util.control.Breaks.break
+import scala.util.control.Breaks.breakable
 
 import org.apache.spark.SparkContext
 
 import com.pesc.tebdi.partitioner.FollowKeyPartitioner
 import com.pesc.tebdi.util.Utils
 
-class IslandsSparkSequentialRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) extends IslandsSpark(sparkContext, optimizationContext) {
+class IslandsSparkSequentialRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
 
-  private val nondominatedPopulationPerMigrationMap = new HashMap[Int, Iterable[MOEASpSolution]]
+  private val nondominatedPopulationPerMigration = new ArrayList[Iterable[MOEASpSolution]]
 
   private var currentMigration = 0
 
-  private var state = 0
+  private var running = false
 
   private var need_stop = false
 
-  def run(): (Iterable[MOEASpSolution], Iterable[MOEASpSolution]) = {
+  def run() {
 
-    implicit def arrayToList[A](a: Array[A]) = a.toList
+    (new Thread(new Runner())).start()
 
-    val oc = optimizationContext
+  }
 
-    val sc = sparkContext
+  private class Runner() extends Runnable {
+    def run() {
 
-    val iniPopulation = oc.moeaAdaptor.generateRandomPopulation(oc.problem, oc.totalPopulationSize)
+      if (running) {
+        throw new Exception("Already running")
+      }
 
-    val iniPopulationWithId = iniPopulation.map(s => (0, s))
+      running = true
 
-    var rddCurrentPopulation = sc.parallelize(iniPopulationWithId.to[Seq], oc.numOfIslands)
+      implicit def arrayToList[A](a: Array[A]) = a.toList
 
-    for (i <- 1 to oc.numOfMigrations) {
+      val oc = optimizationContext
 
-      rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.inIslandRun(oc, index, iter))
+      val sc = sparkContext
 
-      rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.setNewIslands(oc, index, iter))
+      val iniPopulation = oc.moeaAdaptor.generateRandomPopulation(oc.problem, oc.totalPopulationSize)
 
-      rddCurrentPopulation.persist()
+      val iniPopulationWithId = iniPopulation.map(s => (0, s))
 
-      val rddCurrentNondominatedPopulationpopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
+      var rddCurrentPopulation = sc.parallelize(iniPopulationWithId.to[Seq], oc.numOfIslands)
 
-      val currentNondominatedPopulationpopulation = rddCurrentNondominatedPopulationpopulation.collect.toList.map(ind => ind._2)
-      nondominatedPopulationPerMigrationMap += (i -> oc.moeaAdaptor.getNondominatedPopulation(currentNondominatedPopulationpopulation))
+      breakable {
+        for (i <- 1 to oc.numOfMigrations) {
 
-      rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(oc.numOfIslands))
+          rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.inIslandRun(oc, index, iter))
 
+          rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.setNewIslands(oc, index, iter))
+
+          rddCurrentPopulation.persist()
+
+          val rddCurrentNondominatedPopulationpopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
+
+          val currentNondominatedPopulationpopulation = rddCurrentNondominatedPopulationpopulation.collect.toList.map(ind => ind._2)
+          addNondominatedPopulationPerMigration(currentNondominatedPopulationpopulation)
+
+          if (checkNeedStop()) {
+            break
+          }
+
+          rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(oc.numOfIslands))
+
+        }
+      }
+
+      if (!checkNeedStop()) {
+        rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.inIslandRun(oc, index, iter))
+
+        val rddFinalNondominatedPopulationpopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
+
+        val final_population = rddFinalNondominatedPopulationpopulation.collect.toList.map(ind => ind._2)
+        addNondominatedPopulationPerMigration(final_population)
+      }
+
+      Utils.unPersistAllRdds(sc)
+      resetStates()
     }
-
-    rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.inIslandRun(oc, index, iter))
-
-    rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
-
-    val final_population = rddCurrentPopulation.collect.toList.map(ind => ind._2)
-
-    Utils.unPersistAllRdds(sc)
-
-    (oc.moeaAdaptor.getNondominatedPopulation(final_population), final_population)
-
   }
 
-  def getNondominatedPopulation(migrantion: Int) {
-    nondominatedPopulationPerMigrationMap(migrantion)
+  def addNondominatedPopulationPerMigration(currentNondominatedPopulationpopulation: Iterable[MOEASpSolution]) = synchronized {
+    nondominatedPopulationPerMigration.add(optimizationContext.moeaAdaptor.getNondominatedPopulation(currentNondominatedPopulationpopulation))
+    currentMigration += 1
   }
 
-  def getNondominatedPopulation() {
-    nondominatedPopulationPerMigrationMap(currentMigration)
+  def getNondominatedPopulation(migrantion: Int): Iterable[MOEASpSolution] = synchronized {
+    nondominatedPopulationPerMigration.get(migrantion)
   }
 
-  def stop() {
+  def getNondominatedPopulation(): Iterable[MOEASpSolution] = {
+    getNondominatedPopulation(currentMigration - 1)
+  }
+
+  def requestStop() = synchronized {
     need_stop = true
   }
 
-  def checkNeedStop(): Boolean = {
-    if (need_stop) {
-      need_stop = false
-      return need_stop
-    }
+  private def resetStates() = synchronized {
+    need_stop = false
+    running = false
+  }
 
-    false
+  def checkNeedStop(): Boolean = {
+    need_stop
   }
 
 }

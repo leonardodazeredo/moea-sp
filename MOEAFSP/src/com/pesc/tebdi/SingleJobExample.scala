@@ -5,14 +5,13 @@ import org.apache.spark.SparkContext
 import org.moeaframework.core.Solution
 
 import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
-import com.pesc.tebdi.core.IslandsSpark
+import com.pesc.tebdi.core.IslandsSparkSequentialRunner
+import com.pesc.tebdi.core.IslandsSparkSingleRunner
 import com.pesc.tebdi.core.OptimizationContext
 
 import chapter.KnapsackProblem
-import com.pesc.tebdi.core.IslandsSparkSequentialRunner
-import com.pesc.tebdi.core.IslandsSparkSingleRunner
 
-object main {
+object SingleJobExample {
 
   implicit def arrayToList[A](a: Array[A]) = a.toList
 
@@ -43,7 +42,16 @@ object main {
       numOfMigrations = 4,
       numberOfEvaluationsInIslandRatio = 10)
 
-    val (result, population) = (new IslandsSparkSequentialRunner(sc, oc)).run()
+    val runner = new IslandsSparkSequentialRunner(sc, oc)
+
+    runner.run()
+    
+    
+    Thread.sleep(20000)
+    
+    runner.requestStop()
+
+    val result = runner.getNondominatedPopulation()
 
     for ((solution, i) <- result.toList.zipWithIndex) {
       val s = solution.asInstanceOf[Solution]
@@ -56,7 +64,7 @@ object main {
 
     moeaAdaptor.showPlot("NSGAII", result)
 
-    println("Final population size: " + population.size)
+    //    println("Final population size: " + population.size)
   }
 
   def test_islands_single(sc: SparkContext) {

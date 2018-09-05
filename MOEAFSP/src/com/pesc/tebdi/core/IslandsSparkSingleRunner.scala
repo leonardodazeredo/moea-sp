@@ -4,14 +4,14 @@ import org.apache.spark.SparkContext
 
 import com.pesc.tebdi.partitioner.FollowKeyPartitioner
 
-class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) extends IslandsSpark(sparkContext, optimizationContext) {
+class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
 
   def run(): (Iterable[MOEASpSolution], Iterable[MOEASpSolution]) = {
 
     implicit def arrayToList[A](a: Array[A]) = a.toList
-    
+
     val oc = optimizationContext
-    
+
     val sc = sparkContext
 
     val iniPopulation = optimizationContext.moeaAdaptor.generateRandomPopulation(oc.problem, oc.totalPopulationSize)
