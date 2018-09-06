@@ -1,12 +1,13 @@
 package com.pesc.tebdi.util
 
 import org.apache.spark.SparkConf
-import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
 import org.apache.spark.SparkContext
-import chapter.KnapsackProblem
+
+import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
 import com.pesc.tebdi.core.IslandsSparkSequentialRunner
 import com.pesc.tebdi.core.OptimizationContext
-import org.moeaframework.core.Solution
+
+import chapter.KnapsackProblem
 
 object SequentialJobsExample {
 
@@ -40,9 +41,11 @@ object SequentialJobsExample {
 
     val result = runner.getNondominatedPopulation()
 
-    moeaAdaptor.printPopulation(result.toList)
+    val front = result.toList
 
-    moeaAdaptor.showPlot("NSGAII", result)
+    moeaAdaptor.printPopulation(front)
+
+    moeaAdaptor.showPlot("NSGAII", front)
 
   }
 }

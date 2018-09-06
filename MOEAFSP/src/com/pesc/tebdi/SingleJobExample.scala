@@ -34,9 +34,13 @@ object SingleJobExample {
 
     val (result, population) = (new IslandsSparkSingleRunner(sc, oc)).run()
 
-    moeaAdaptor.printPopulation(result.toList)
+    val front = result.toList
 
-    moeaAdaptor.showPlot("NSGAII", result)
+    moeaAdaptor.printPopulation(front)
+
+    moeaAdaptor.showPlot("NSGAII", front)
+
+    println("Population size of last shuffle: " + population.size)
 
   }
 

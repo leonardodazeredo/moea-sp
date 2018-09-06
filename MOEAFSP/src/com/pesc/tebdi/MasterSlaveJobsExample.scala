@@ -2,7 +2,6 @@ package com.pesc.tebdi
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
-import org.moeaframework.core.Solution
 
 import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
 import com.pesc.tebdi.core.OptimizationContext
@@ -36,9 +35,11 @@ object MasterSlaveJobsExample {
 
     val (result, population) = moeaAdaptor.runNSGAII_MasterSlave_Sp(sc, pc, iniPopulation)
 
-    moeaAdaptor.printPopulation(result.toList)
+    val front = result.toList
 
-    moeaAdaptor.showPlot("NSGAII", result.toList)
+    moeaAdaptor.printPopulation(front)
+
+    moeaAdaptor.showPlot("NSGAII", front)
 
   }
 

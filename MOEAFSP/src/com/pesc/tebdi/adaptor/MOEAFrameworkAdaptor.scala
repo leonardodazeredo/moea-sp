@@ -57,7 +57,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
         val p = problem
 
         val solutionScalaList = solutions.asScala
-        val solutionsRDD = sc.parallelize(solutionScalaList.to[Seq])
+        val solutionsRDD = sc.parallelize(solutionScalaList.to[Seq], 4)
         val rdd = solutionsRDD.map(s => { p.evaluate(s); s })
         val ss = rdd.collect
 
