@@ -10,7 +10,9 @@ import org.moeaframework.core.EpsilonBoxDominanceArchive
 import org.moeaframework.core.Initialization
 import org.moeaframework.core.NondominatedPopulation
 import org.moeaframework.core.NondominatedSortingPopulation
+import org.moeaframework.core.Problem
 import org.moeaframework.core.Selection
+import org.moeaframework.core.Solution
 import org.moeaframework.core.Variation
 import org.moeaframework.core.comparator.ChainedComparator
 import org.moeaframework.core.comparator.CrowdingComparator
@@ -22,18 +24,15 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
-import com.pesc.tebdi.core.MOEASpSolution
 import com.pesc.tebdi.core.MOEASpProblem
-
+import com.pesc.tebdi.core.MOEASpSolution
 import com.pesc.tebdi.core.OptimizationContext
-import org.moeaframework.core.Problem
-import org.moeaframework.core.Solution
 
 class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
   def generateRandomPopulation(problem: MOEASpProblem, size: Int): Iterable[MOEASpSolution] = {
     implicit def arrayToList[A](a: Array[A]) = a.toList
-    
+
     val ini = new RandomInitialization(problem.asInstanceOf[Problem], size)
 
     ini.initialize().toList
@@ -49,7 +48,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
   def runNSGAII_MasterSlave_Sp(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
 
     class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
-      selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
+                    selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
 
       override def evaluateAll(solutions: java.lang.Iterable[Solution]): Unit = {
 
@@ -155,6 +154,24 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     val p = new Plot()
       .add(algorithm, solutions)
       .show();
+  }
+
+  def printPopulation(result: Iterable[MOEASpSolution]) {
+    for ((solution, i) <- result.toList.zipWithIndex) {
+      val s = solution.asInstanceOf[Solution]
+
+      var objectives = s.getObjectives();
+      print("Solution " + i + ": (");
+
+      objectives.foreach(o => print(" " + o))
+
+      print(" ) ")
+
+      println(s.getVariable(0));
+    }
+
+    println("Population size: " + result.size)
+
   }
 
 }
