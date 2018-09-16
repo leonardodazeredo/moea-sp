@@ -1,4 +1,4 @@
-package com.pesc.tebdi.util
+package com.pesc.tebdi
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
@@ -35,7 +35,7 @@ object SequentialJobsExample {
 
     runner.run()
 
-    Thread.sleep(20000)
+    Thread.sleep(80000)
 
     runner.requestStop()
 
