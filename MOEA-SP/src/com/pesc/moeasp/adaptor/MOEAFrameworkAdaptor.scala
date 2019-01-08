@@ -45,6 +45,33 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     solutions.asScala.toList
   }
 
+  def showPlot(algorithm: String, population: Iterable[MOEASpSolution]) {
+
+    val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
+
+    val p = new Plot()
+      .add(algorithm, solutions)
+      .show();
+  }
+
+  def printPopulation(result: Iterable[MOEASpSolution]) {
+    for ((solution, i) <- result.toList.zipWithIndex) {
+      val s = solution.asInstanceOf[Solution]
+
+      var objectives = s.getObjectives();
+      print("Solution " + i + ": (");
+
+      objectives.foreach(o => print(" " + o))
+
+      print(" ) ")
+
+      println(s.getVariable(0));
+    }
+
+    println("Population size: " + result.size)
+
+  }
+
   def runNSGAII_MasterSlave_Sp(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
 
     class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
@@ -145,33 +172,6 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     }
 
     (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
-  }
-
-  def showPlot(algorithm: String, population: Iterable[MOEASpSolution]) {
-
-    val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
-
-    val p = new Plot()
-      .add(algorithm, solutions)
-      .show();
-  }
-
-  def printPopulation(result: Iterable[MOEASpSolution]) {
-    for ((solution, i) <- result.toList.zipWithIndex) {
-      val s = solution.asInstanceOf[Solution]
-
-      var objectives = s.getObjectives();
-      print("Solution " + i + ": (");
-
-      objectives.foreach(o => print(" " + o))
-
-      print(" ) ")
-
-      println(s.getVariable(0));
-    }
-
-    println("Population size: " + result.size)
-
   }
 
 }
