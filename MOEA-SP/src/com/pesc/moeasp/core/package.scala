@@ -7,11 +7,9 @@ package object core {
 
   type MOEASpProblem = Object
   
-  type MOEASpAlgorithm = Object
-
   type Individual = (Int, MOEASpSolution)
 
-  case class OptimizationContext(moeaAdaptor: MOEASpAdaptor, problem: MOEASpProblem, algorithm: MOEASpAlgorithm,
+  case class OptimizationContext(moeaAdaptor: MOEASpAdaptor, problem: MOEASpProblem, algorithmId: String,
                                  totalPopulationSize:              Int,
                                  numOfIslands:                     Int,
                                  migrationSizeInIslandPercentage:  Double,

@@ -24,7 +24,7 @@ object MasterSlaveJobsExample {
 
     val problem = new KnapsackProblem();
 
-    val pc = OptimizationContext(moeaAdaptor, problem,
+    val pc = OptimizationContext(moeaAdaptor, problem, "NSGAII",
       totalPopulationSize = 50000,
       numOfIslands = 100,
       migrationSizeInIslandPercentage = 0.1,

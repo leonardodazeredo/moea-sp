@@ -25,7 +25,7 @@ object SingleJobExample {
 
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
-    val oc = OptimizationContext(moeaAdaptor, problem,
+    val oc = OptimizationContext(moeaAdaptor, problem, "NSGAII",
       totalPopulationSize = 50000,
       numOfIslands = 100,
       migrationSizeInIslandPercentage = 0.1,

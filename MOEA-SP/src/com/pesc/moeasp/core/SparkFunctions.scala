@@ -10,7 +10,7 @@ object SparkFunctions extends Serializable {
 
     val parent_population = iter.toList.map(ind => ind._2)
 
-    val (result, descendant_population) = pc.moeaAdaptor.runNSGAII(pc, parent_population)
+    val (result, descendant_population) = pc.moeaAdaptor.run(pc, parent_population)
 
     descendant_population.map(s => (islandId, s))
   }

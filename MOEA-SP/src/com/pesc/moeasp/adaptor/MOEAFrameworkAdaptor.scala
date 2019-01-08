@@ -4,6 +4,7 @@ import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.JavaConverters.seqAsJavaListConverter
 
 import org.apache.spark.SparkContext
+import org.moeaframework.algorithm.AbstractEvolutionaryAlgorithm
 import org.moeaframework.algorithm.NSGAII
 import org.moeaframework.analysis.plot.Plot
 import org.moeaframework.core.EpsilonBoxDominanceArchive
@@ -136,7 +137,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
   }
 
-  def runNSGAII(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
+  def run(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
 
     if (iniPopulation.isEmpty) {
       val iniPopulation = generateRandomPopulation(pc.problem, 1000)
@@ -147,31 +148,40 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
       iniPopulation.size,
       iniPopulation.asInstanceOf[List[Solution]].asJava);
 
-    val selection = new TournamentSelection(
-      2,
-      new ChainedComparator(
-        new ParetoDominanceComparator(),
-        new CrowdingComparator()));
+    var algorithm = new Object
 
-    val variation = new GAVariation(
-      new SBX(1.0, 25.0),
-      new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
+    if (pc.algorithmId.equals("NSGAII")) {
+      val selection = new TournamentSelection(
+        2,
+        new ChainedComparator(
+          new ParetoDominanceComparator(),
+          new CrowdingComparator()));
 
-    val algorithm = new NSGAII(
-      pc.problem.asInstanceOf[Problem],
-      new NondominatedSortingPopulation(),
-      null, // no archive
-      selection,
-      variation,
-      initialization);
+      val variation = new GAVariation(
+        new SBX(1.0, 25.0),
+        new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
+
+      algorithm = new NSGAII(
+        pc.problem.asInstanceOf[Problem],
+        new NondominatedSortingPopulation(),
+        null, // no archive
+        selection,
+        variation,
+        initialization);
+    }
+    else {
+      throw new Exception
+    }
+
+    val algo = algorithm.asInstanceOf[AbstractEvolutionaryAlgorithm]
 
     val size = iniPopulation.size
 
-    while (algorithm.getNumberOfEvaluations < size * pc.numberOfEvaluationsInIslandRatio) {
-      algorithm.step();
+    while (algo.getNumberOfEvaluations < size * pc.numberOfEvaluationsInIslandRatio) {
+      algo.step();
     }
 
-    (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
+    (algo.getResult.asScala.iterator, algo.getPopulation.asScala.iterator)
   }
 
 }

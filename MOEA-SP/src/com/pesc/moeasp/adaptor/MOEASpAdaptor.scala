@@ -12,8 +12,8 @@ trait MOEASpAdaptor extends Serializable {
 
   def getNondominatedPopulation(population: Iterable[MOEASpSolution]): Iterable[MOEASpSolution]
 
-  def runNSGAII(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution])
-  
   def runNSGAII_MasterSlave_Sp(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution])
+
+  def run(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution])
 
 }
