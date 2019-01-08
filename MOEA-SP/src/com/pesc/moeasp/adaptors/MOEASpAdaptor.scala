@@ -1,4 +1,4 @@
-package com.pesc.moeasp.adaptor
+package com.pesc.moeasp.adaptors
 
 import org.apache.spark.SparkContext
 

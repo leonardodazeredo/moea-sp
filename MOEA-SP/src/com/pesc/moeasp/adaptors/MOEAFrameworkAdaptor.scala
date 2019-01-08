@@ -1,4 +1,4 @@
-package com.pesc.moeasp.adaptor
+package com.pesc.moeasp.adaptors
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.JavaConverters.seqAsJavaListConverter

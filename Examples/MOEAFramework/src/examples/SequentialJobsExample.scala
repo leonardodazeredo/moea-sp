@@ -13,7 +13,7 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
-import com.pesc.moeasp.adaptor.MOEAFrameworkAdaptor
+import com.pesc.moeasp.adaptors.MOEAFrameworkAdaptor
 import com.pesc.moeasp.core.IslandsSparkSequentialRunner
 import com.pesc.moeasp.core.MOEASpParameter
 import com.pesc.moeasp.core.OptimizationContext

@@ -18,8 +18,8 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
-import com.pesc.moeasp.adaptor.MOEAFrameworkAdaptor
-import com.pesc.moeasp.adaptor.NSGAII_SP
+import com.pesc.moeasp.adaptors.MOEAFrameworkAdaptor
+import com.pesc.moeasp.adaptors.NSGAII_SP
 
 import chapter.KnapsackProblem
 
