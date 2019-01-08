@@ -46,7 +46,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     solutions.asScala.toList
   }
 
-  protected class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
+  class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
                             selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
 
     override def evaluateAll(solutions: java.lang.Iterable[Solution]): Unit = {
@@ -114,8 +114,6 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
     val algo = algorithm.asInstanceOf[AbstractEvolutionaryAlgorithm]
 
-    val size = iniPopulation.size
-
     while (algo.getNumberOfEvaluations < maxNumberOfEvaluations) {
       algo.step();
     }
@@ -134,7 +132,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
       iniPopulation.size,
       iniPopulation.asInstanceOf[List[Solution]].asJava);
     
-    var maxNumberOfEvaluations = 5000
+    var maxNumberOfEvaluations = iniPopulation.size * pc.numberOfEvaluationsInIslandRatio
 
     var algorithm = new Object
 
@@ -162,9 +160,7 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
     val algo = algorithm.asInstanceOf[AbstractEvolutionaryAlgorithm]
 
-    val size = iniPopulation.size
-
-    while (algo.getNumberOfEvaluations < size * pc.numberOfEvaluationsInIslandRatio) {
+    while (algo.getNumberOfEvaluations < maxNumberOfEvaluations) {
       algo.step();
     }
 
