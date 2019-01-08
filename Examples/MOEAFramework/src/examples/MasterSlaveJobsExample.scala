@@ -33,7 +33,7 @@ object MasterSlaveJobsExample {
 
     val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, pc.totalPopulationSize)
 
-    val (result, population) = moeaAdaptor.runNSGAII_MasterSlave_Sp(sc, pc, iniPopulation)
+    val (result, population) = moeaAdaptor.runSparkMasterSlave(sc, pc, iniPopulation)
 
     val front = result.toList
 

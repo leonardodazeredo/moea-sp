@@ -46,6 +46,134 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     solutions.asScala.toList
   }
 
+  protected class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
+                            selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
+
+    override def evaluateAll(solutions: java.lang.Iterable[Solution]): Unit = {
+
+      implicit def arrayToList[A](a: Array[A]) = a.toList
+
+      val p = problem
+
+      val solutionScalaList = solutions.asScala
+      val solutionsRDD = sc.parallelize(solutionScalaList.to[Seq], 4)
+      val rdd = solutionsRDD.map(s => { p.evaluate(s); s })
+      val ss = rdd.collect
+
+      this.numberOfEvaluations += ss.size
+
+      var i = 0
+      val iter = solutions.iterator()
+      while (iter.hasNext()) {
+        val s = iter.next().asInstanceOf[Solution]
+        s.setConstraints(ss(i).getConstraints)
+        s.setObjectives(ss(i).getObjectives)
+        i += 1
+      }
+    }
+  }
+
+  def runSparkMasterSlave(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
+
+    if (iniPopulation.isEmpty) {
+      val iniPopulation = generateRandomPopulation(pc.problem, pc.totalPopulationSize)
+    }
+
+    val initialization = new InjectedInitialization(
+      pc.problem.asInstanceOf[Problem],
+      iniPopulation.size,
+      iniPopulation.asInstanceOf[List[Solution]].asJava);
+    
+    var maxNumberOfEvaluations = 5000
+
+    var algorithm = new Object
+
+    if (pc.algorithmId.equals("NSGAII")) {
+      val selection = new TournamentSelection(
+        2,
+        new ChainedComparator(
+          new ParetoDominanceComparator(),
+          new CrowdingComparator()));
+
+      val variation = new GAVariation(
+        new SBX(1.0, 25.0),
+        new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
+
+      algorithm = new NSGAII_SP(
+        sc,
+        pc.problem.asInstanceOf[Problem],
+        new NondominatedSortingPopulation(),
+        null, // no archive
+        selection,
+        variation,
+        initialization);
+
+    } else {
+      throw new Exception
+    }
+
+    val algo = algorithm.asInstanceOf[AbstractEvolutionaryAlgorithm]
+
+    val size = iniPopulation.size
+
+    while (algo.getNumberOfEvaluations < maxNumberOfEvaluations) {
+      algo.step();
+    }
+
+    (algo.getResult.asScala.iterator, algo.getPopulation.asScala.iterator)
+  }
+
+  def run(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
+
+    if (iniPopulation.isEmpty) {
+      val iniPopulation = generateRandomPopulation(pc.problem, 1000)
+    }
+
+    val initialization = new InjectedInitialization(
+      pc.problem.asInstanceOf[Problem],
+      iniPopulation.size,
+      iniPopulation.asInstanceOf[List[Solution]].asJava);
+    
+    var maxNumberOfEvaluations = 5000
+
+    var algorithm = new Object
+
+    if (pc.algorithmId.equals("NSGAII")) {
+      val selection = new TournamentSelection(
+        2,
+        new ChainedComparator(
+          new ParetoDominanceComparator(),
+          new CrowdingComparator()));
+
+      val variation = new GAVariation(
+        new SBX(1.0, 25.0),
+        new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
+
+      algorithm = new NSGAII(
+        pc.problem.asInstanceOf[Problem],
+        new NondominatedSortingPopulation(),
+        null, // no archive
+        selection,
+        variation,
+        initialization);
+    } else {
+      throw new Exception
+    }
+
+    val algo = algorithm.asInstanceOf[AbstractEvolutionaryAlgorithm]
+
+    val size = iniPopulation.size
+
+    while (algo.getNumberOfEvaluations < size * pc.numberOfEvaluationsInIslandRatio) {
+      algo.step();
+    }
+
+    (algo.getResult.asScala.iterator, algo.getPopulation.asScala.iterator)
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
   def showPlot(algorithm: String, population: Iterable[MOEASpSolution]) {
 
     val solutions = new NondominatedPopulation(population.asInstanceOf[List[Solution]].asJava);
@@ -71,117 +199,6 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
     println("Population size: " + result.size)
 
-  }
-
-  def runNSGAII_MasterSlave_Sp(sc: SparkContext, pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
-
-    class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSortingPopulation, archive: EpsilonBoxDominanceArchive,
-                    selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
-
-      override def evaluateAll(solutions: java.lang.Iterable[Solution]): Unit = {
-
-        implicit def arrayToList[A](a: Array[A]) = a.toList
-
-        val p = problem
-
-        val solutionScalaList = solutions.asScala
-        val solutionsRDD = sc.parallelize(solutionScalaList.to[Seq], 4)
-        val rdd = solutionsRDD.map(s => { p.evaluate(s); s })
-        val ss = rdd.collect
-
-        this.numberOfEvaluations += ss.size
-
-        var i = 0
-        val iter = solutions.iterator()
-        while (iter.hasNext()) {
-          val s = iter.next().asInstanceOf[Solution]
-          s.setConstraints(ss(i).getConstraints)
-          s.setObjectives(ss(i).getObjectives)
-          i += 1
-        }
-      }
-    }
-
-    if (iniPopulation.isEmpty) {
-      val iniPopulation = generateRandomPopulation(pc.problem, pc.totalPopulationSize)
-    }
-
-    val initialization = new InjectedInitialization(
-      pc.problem.asInstanceOf[Problem],
-      iniPopulation.size,
-      iniPopulation.asInstanceOf[List[Solution]].asJava);
-
-    val selection = new TournamentSelection(
-      2,
-      new ChainedComparator(
-        new ParetoDominanceComparator(),
-        new CrowdingComparator()));
-
-    val variation = new GAVariation(
-      new SBX(1.0, 25.0),
-      new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
-
-    val algorithm = new NSGAII_SP(
-      sc,
-      pc.problem.asInstanceOf[Problem],
-      new NondominatedSortingPopulation(),
-      null, // no archive
-      selection,
-      variation,
-      initialization);
-
-    while (algorithm.getNumberOfEvaluations < 5000) {
-      algorithm.step();
-    }
-
-    (algorithm.getResult.asScala.iterator, algorithm.getPopulation.asScala.iterator)
-  }
-
-  def run(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
-
-    if (iniPopulation.isEmpty) {
-      val iniPopulation = generateRandomPopulation(pc.problem, 1000)
-    }
-
-    val initialization = new InjectedInitialization(
-      pc.problem.asInstanceOf[Problem],
-      iniPopulation.size,
-      iniPopulation.asInstanceOf[List[Solution]].asJava);
-
-    var algorithm = new Object
-
-    if (pc.algorithmId.equals("NSGAII")) {
-      val selection = new TournamentSelection(
-        2,
-        new ChainedComparator(
-          new ParetoDominanceComparator(),
-          new CrowdingComparator()));
-
-      val variation = new GAVariation(
-        new SBX(1.0, 25.0),
-        new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
-
-      algorithm = new NSGAII(
-        pc.problem.asInstanceOf[Problem],
-        new NondominatedSortingPopulation(),
-        null, // no archive
-        selection,
-        variation,
-        initialization);
-    }
-    else {
-      throw new Exception
-    }
-
-    val algo = algorithm.asInstanceOf[AbstractEvolutionaryAlgorithm]
-
-    val size = iniPopulation.size
-
-    while (algo.getNumberOfEvaluations < size * pc.numberOfEvaluationsInIslandRatio) {
-      algo.step();
-    }
-
-    (algo.getResult.asScala.iterator, algo.getPopulation.asScala.iterator)
   }
 
 }
