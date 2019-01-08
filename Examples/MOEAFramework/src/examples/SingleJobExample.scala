@@ -5,6 +5,7 @@ import org.apache.spark.SparkContext
 
 import com.pesc.moeasp.adaptor.MOEAFrameworkAdaptor
 import com.pesc.moeasp.core.IslandsSparkSingleRunner
+import com.pesc.moeasp.core.OptimizationContext
 
 import chapter.KnapsackProblem
 

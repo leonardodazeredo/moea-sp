@@ -11,13 +11,13 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/MOEAFramework-2.12"/>
-	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/MOEA-SP"/>
 	<classpathentry kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/MOEA-SP"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/MOEAFramework-2.12"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
