@@ -9,9 +9,11 @@ package object core {
 
   type MOEASpProblem = Object
   
+  type MOEASpParameter = Object
+  
   type Individual = (Int, MOEASpSolution)
 
-  case class OptimizationContext(moeaAdaptor: MOEASpAdaptor, problem: MOEASpProblem, algorithmId: String, parameterMap: HashMap[String,Object],
+  case class OptimizationContext(moeaAdaptor: MOEASpAdaptor, problem: MOEASpProblem, algorithmId: String, parameterMap: HashMap[String,MOEASpParameter],
                                  totalPopulationSize:              Int,
                                  numOfIslands:                     Int,
                                  migrationSizeInIslandPercentage:  Double,

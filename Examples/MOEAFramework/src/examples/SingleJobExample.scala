@@ -15,6 +15,7 @@ import org.moeaframework.core.operator.real.SBX
 
 import com.pesc.moeasp.adaptor.MOEAFrameworkAdaptor
 import com.pesc.moeasp.core.IslandsSparkSingleRunner
+import com.pesc.moeasp.core.MOEASpParameter
 import com.pesc.moeasp.core.OptimizationContext
 
 import chapter.KnapsackProblem
@@ -45,7 +46,7 @@ object SingleJobExample {
 
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
-    val parameterMap = HashMap[String, Object](("selection", selection), ("variation", variation))
+    val parameterMap = HashMap[String, MOEASpParameter](("selection", selection), ("variation", variation))
 
     val oc = OptimizationContext(moeaAdaptor, problem, "NSGAII", parameterMap,
       totalPopulationSize = 50000,
