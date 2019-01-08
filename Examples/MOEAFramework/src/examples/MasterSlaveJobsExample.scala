@@ -1,10 +1,25 @@
 package examples
 
+import scala.collection.JavaConverters.iterableAsScalaIterableConverter
+import scala.collection.JavaConverters.seqAsJavaListConverter
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import org.moeaframework.algorithm.AbstractEvolutionaryAlgorithm
+import org.moeaframework.core.NondominatedSortingPopulation
+import org.moeaframework.core.Problem
+import org.moeaframework.core.Solution
+import org.moeaframework.core.comparator.ChainedComparator
+import org.moeaframework.core.comparator.CrowdingComparator
+import org.moeaframework.core.comparator.ParetoDominanceComparator
+import org.moeaframework.core.operator.GAVariation
+import org.moeaframework.core.operator.InjectedInitialization
+import org.moeaframework.core.operator.TournamentSelection
+import org.moeaframework.core.operator.real.PM
+import org.moeaframework.core.operator.real.SBX
 
 import com.pesc.moeasp.adaptor.MOEAFrameworkAdaptor
-import com.pesc.moeasp.core.OptimizationContext
+import com.pesc.moeasp.adaptor.NSGAII_SP
 
 import chapter.KnapsackProblem
 
@@ -24,18 +39,37 @@ object MasterSlaveJobsExample {
 
     val problem = new KnapsackProblem();
 
-    val pc = OptimizationContext(moeaAdaptor, problem, "NSGAII",
-      totalPopulationSize = 50000,
-      numOfIslands = 100,
-      migrationSizeInIslandPercentage = 0.1,
-      numOfMigrations = 4,
-      numberOfEvaluationsInIslandRatio = 10)
+    val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, 50000)
 
-    val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, pc.totalPopulationSize)
+    val initialization = new InjectedInitialization(
+      problem.asInstanceOf[Problem],
+      iniPopulation.size,
+      iniPopulation.asInstanceOf[List[Solution]].asJava);
 
-    val (result, population) = moeaAdaptor.runSparkMasterSlave(sc, pc, iniPopulation)
+    val selection = new TournamentSelection(
+      2,
+      new ChainedComparator(
+        new ParetoDominanceComparator(),
+        new CrowdingComparator()));
 
-    val front = result.toList
+    val variation = new GAVariation(
+      new SBX(1.0, 25.0),
+      new PM(1.0 / problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
+
+    val algorithm = new NSGAII_SP(
+      sc,
+      problem.asInstanceOf[Problem],
+      new NondominatedSortingPopulation(),
+      null, // no archive
+      selection,
+      variation,
+      initialization);
+
+    while (algorithm.getNumberOfEvaluations < 5000) {
+      algorithm.step();
+    }
+
+    val front = algorithm.getResult.asScala.iterator.toList
 
     moeaAdaptor.printPopulation(front)
 
