@@ -1,4 +1,4 @@
-package com.pesc.moeasp.partitioner
+package com.ufrj.pesc.moeasp.partitioner
 
 import org.apache.spark.Partitioner
 

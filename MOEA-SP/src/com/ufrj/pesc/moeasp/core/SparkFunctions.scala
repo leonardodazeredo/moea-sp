@@ -1,8 +1,8 @@
-package com.pesc.moeasp.core
+package com.ufrj.pesc.moeasp.core
 
 import scala.util.Random
 
-import com.pesc.moeasp.util.Utils
+import com.ufrj.pesc.moeasp.util.Utils
 
 object SparkFunctions extends Serializable {
 

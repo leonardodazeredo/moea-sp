@@ -1,4 +1,4 @@
-package com.pesc.moeasp.core
+package com.ufrj.pesc.moeasp.core
 
 import java.util.ArrayList
 
@@ -7,8 +7,8 @@ import scala.util.control.Breaks.breakable
 
 import org.apache.spark.SparkContext
 
-import com.pesc.moeasp.partitioner.FollowKeyPartitioner
-import com.pesc.moeasp.util.Utils
+import com.ufrj.pesc.moeasp.partitioner.FollowKeyPartitioner
+import com.ufrj.pesc.moeasp.util.Utils
 
 class IslandsSparkSequentialRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
 

@@ -13,10 +13,10 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
-import com.pesc.moeasp.adaptors.MOEAFrameworkAdaptor
-import com.pesc.moeasp.core.IslandsSparkSingleRunner
-import com.pesc.moeasp.core.MOEASpParameter
-import com.pesc.moeasp.core.OptimizationContext
+import com.ufrj.pesc.moeasp.adaptors.MOEAFrameworkAdaptor
+import com.ufrj.pesc.moeasp.core.IslandsSparkSingleRunner
+import com.ufrj.pesc.moeasp.core.MOEASpParameter
+import com.ufrj.pesc.moeasp.core.OptimizationContext
 
 import chapter.KnapsackProblem
 

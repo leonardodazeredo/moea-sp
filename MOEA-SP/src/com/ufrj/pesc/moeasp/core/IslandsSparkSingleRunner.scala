@@ -1,8 +1,8 @@
-package com.pesc.moeasp.core
+package com.ufrj.pesc.moeasp.core
 
 import org.apache.spark.SparkContext
 
-import com.pesc.moeasp.partitioner.FollowKeyPartitioner
+import com.ufrj.pesc.moeasp.partitioner.FollowKeyPartitioner
 
 class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
 

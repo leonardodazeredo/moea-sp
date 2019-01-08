@@ -1,4 +1,4 @@
-package com.pesc.moeasp.util
+package com.ufrj.pesc.moeasp.util
 
 import scala.util.Random
 

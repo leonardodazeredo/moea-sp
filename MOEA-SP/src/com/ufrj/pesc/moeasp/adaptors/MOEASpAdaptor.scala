@@ -1,10 +1,10 @@
-package com.pesc.moeasp.adaptors
+package com.ufrj.pesc.moeasp.adaptors
 
 import org.apache.spark.SparkContext
 
-import com.pesc.moeasp.core.OptimizationContext
-import com.pesc.moeasp.core.MOEASpProblem
-import com.pesc.moeasp.core.MOEASpSolution
+import com.ufrj.pesc.moeasp.core.OptimizationContext
+import com.ufrj.pesc.moeasp.core.MOEASpProblem
+import com.ufrj.pesc.moeasp.core.MOEASpSolution
 
 trait MOEASpAdaptor extends Serializable {
 

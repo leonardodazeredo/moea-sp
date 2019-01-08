@@ -2,7 +2,7 @@ package com.pesc.moeasp
 
 import scala.collection.mutable.HashMap
 
-import com.pesc.moeasp.adaptors.MOEASpAdaptor
+import com.ufrj.pesc.moeasp.adaptors.MOEASpAdaptor
 
 package object core {
   type MOEASpSolution = Object

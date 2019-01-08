@@ -1,4 +1,4 @@
-package com.pesc.moeasp.adaptors
+package com.ufrj.pesc.moeasp.adaptors
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -19,9 +19,9 @@ import org.moeaframework.core.operator.CompoundVariation
 import org.moeaframework.core.operator.InjectedInitialization
 import org.moeaframework.core.operator.RandomInitialization
 
-import com.pesc.moeasp.core.MOEASpProblem
-import com.pesc.moeasp.core.MOEASpSolution
-import com.pesc.moeasp.core.OptimizationContext
+import com.ufrj.pesc.moeasp.core.MOEASpProblem
+import com.ufrj.pesc.moeasp.core.MOEASpSolution
+import com.ufrj.pesc.moeasp.core.OptimizationContext
 
 class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
