@@ -1,4 +1,4 @@
-package com.pesc.moeasp
+package com.ufrj.pesc.moeasp
 
 import scala.collection.mutable.HashMap
 
