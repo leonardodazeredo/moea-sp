@@ -15,9 +15,16 @@ import org.moeaframework.core.Problem
 import org.moeaframework.core.Selection
 import org.moeaframework.core.Solution
 import org.moeaframework.core.Variation
+import org.moeaframework.core.comparator.ChainedComparator
+import org.moeaframework.core.comparator.CrowdingComparator
+import org.moeaframework.core.comparator.ParetoDominanceComparator
 import org.moeaframework.core.operator.CompoundVariation
+import org.moeaframework.core.operator.GAVariation
 import org.moeaframework.core.operator.InjectedInitialization
 import org.moeaframework.core.operator.RandomInitialization
+import org.moeaframework.core.operator.TournamentSelection
+import org.moeaframework.core.operator.real.PM
+import org.moeaframework.core.operator.real.SBX
 
 import com.ufrj.pesc.moeasp.core.MOEASpProblem
 import com.ufrj.pesc.moeasp.core.MOEASpSolution
@@ -56,12 +63,23 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     var algorithm = new Object
 
     if (pc.algorithmId.equals("NSGAII")) {
+
+      val selection = new TournamentSelection(
+        2,
+        new ChainedComparator(
+          new ParetoDominanceComparator(),
+          new CrowdingComparator()));
+
+      val variation = new GAVariation(
+        new SBX(1.0, 25.0),
+        new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
+
       algorithm = new NSGAII(
         pc.problem.asInstanceOf[Problem],
         new NondominatedSortingPopulation(),
         null, // no archive
-        pc.parameterMap("selection").asInstanceOf[Selection],
-        pc.parameterMap("variation").asInstanceOf[CompoundVariation],
+        selection,
+        variation,
         initialization);
     } else {
       throw new Exception
