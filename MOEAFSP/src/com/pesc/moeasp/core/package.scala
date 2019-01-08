@@ -1,6 +1,6 @@
-package com.pesc.tebdi
+package com.pesc.moeasp
 
-import com.pesc.tebdi.adaptor.MOEASpAdaptor
+import com.pesc.moeasp.adaptor.MOEASpAdaptor
 
 package object core {
   type MOEASpSolution = Object

@@ -1,8 +1,8 @@
-package com.pesc.tebdi.core
+package com.pesc.moeasp.core
 
 import scala.util.Random
 
-import com.pesc.tebdi.util.Utils
+import com.pesc.moeasp.util.Utils
 
 object SparkFunctions extends Serializable {
 

@@ -1,4 +1,4 @@
-package com.pesc.tebdi.adaptor
+package com.pesc.moeasp.adaptor
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.JavaConverters.seqAsJavaListConverter
@@ -24,9 +24,9 @@ import org.moeaframework.core.operator.TournamentSelection
 import org.moeaframework.core.operator.real.PM
 import org.moeaframework.core.operator.real.SBX
 
-import com.pesc.tebdi.core.MOEASpProblem
-import com.pesc.tebdi.core.MOEASpSolution
-import com.pesc.tebdi.core.OptimizationContext
+import com.pesc.moeasp.core.MOEASpProblem
+import com.pesc.moeasp.core.MOEASpSolution
+import com.pesc.moeasp.core.OptimizationContext
 
 class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 

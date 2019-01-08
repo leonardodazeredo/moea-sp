@@ -1,18 +1,18 @@
-package com.pesc.tebdi
+package com.pesc.moeasp
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
-import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
-import com.pesc.tebdi.core.IslandsSparkSequentialRunner
-import com.pesc.tebdi.core.OptimizationContext
+import com.pesc.moeasp.adaptor.MOEAFrameworkAdaptor
+import com.pesc.moeasp.core.OptimizationContext
 
 import chapter.KnapsackProblem
 
-object SequentialJobsExample {
+object MasterSlaveJobsExample {
+
+  implicit def arrayToList[A](a: Array[A]) = a.toList
 
   def main(args: Array[String]): Unit = {
-    implicit def arrayToList[A](a: Array[A]) = a.toList
 
     val conf = new SparkConf()
       .setAppName("main")
@@ -20,26 +20,20 @@ object SequentialJobsExample {
 
     val sc = new SparkContext(conf)
 
-    val problem = new KnapsackProblem();
-
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
-    val oc = OptimizationContext(moeaAdaptor, problem,
+    val problem = new KnapsackProblem();
+
+    val pc = OptimizationContext(moeaAdaptor, problem,
       totalPopulationSize = 50000,
       numOfIslands = 100,
       migrationSizeInIslandPercentage = 0.1,
       numOfMigrations = 4,
       numberOfEvaluationsInIslandRatio = 10)
 
-    val runner = new IslandsSparkSequentialRunner(sc, oc)
+    val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, pc.totalPopulationSize)
 
-    runner.run()
-
-    Thread.sleep(80000)
-
-    runner.requestStop()
-
-    val result = runner.getNondominatedPopulation()
+    val (result, population) = moeaAdaptor.runNSGAII_MasterSlave_Sp(sc, pc, iniPopulation)
 
     val front = result.toList
 
@@ -48,4 +42,5 @@ object SequentialJobsExample {
     moeaAdaptor.showPlot("NSGAII", front)
 
   }
+
 }

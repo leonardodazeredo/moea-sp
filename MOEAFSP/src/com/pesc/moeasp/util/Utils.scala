@@ -1,4 +1,4 @@
-package com.pesc.tebdi.util
+package com.pesc.moeasp.util
 
 import scala.util.Random
 

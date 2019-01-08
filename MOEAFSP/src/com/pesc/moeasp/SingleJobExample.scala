@@ -1,11 +1,11 @@
-package com.pesc.tebdi
+package com.pesc.moeasp
 
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
-import com.pesc.tebdi.adaptor.MOEAFrameworkAdaptor
-import com.pesc.tebdi.core.IslandsSparkSingleRunner
-import com.pesc.tebdi.core.OptimizationContext
+import com.pesc.moeasp.adaptor.MOEAFrameworkAdaptor
+import com.pesc.moeasp.core.IslandsSparkSingleRunner
+import com.pesc.moeasp.core.OptimizationContext
 
 import chapter.KnapsackProblem
 

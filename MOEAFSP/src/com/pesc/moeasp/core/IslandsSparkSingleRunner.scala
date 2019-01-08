@@ -1,8 +1,8 @@
-package com.pesc.tebdi.core
+package com.pesc.moeasp.core
 
 import org.apache.spark.SparkContext
 
-import com.pesc.tebdi.partitioner.FollowKeyPartitioner
+import com.pesc.moeasp.partitioner.FollowKeyPartitioner
 
 class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
 

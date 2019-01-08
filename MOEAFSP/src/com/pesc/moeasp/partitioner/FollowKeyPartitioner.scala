@@ -1,4 +1,4 @@
-package com.pesc.tebdi.partitioner
+package com.pesc.moeasp.partitioner
 
 import org.apache.spark.Partitioner
 
