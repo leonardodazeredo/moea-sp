@@ -1,13 +1,11 @@
 package chapter;
 
-import java.io.Serializable;
-
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.variable.EncodingUtils;
 import org.moeaframework.problem.AbstractProblem;
 import org.moeaframework.util.Vector;
 
-public class KnapsackProblem extends AbstractProblem implements Serializable {
+public class KnapsackProblem extends AbstractProblem {
 
 	/**
 	 * The number of sacks.
