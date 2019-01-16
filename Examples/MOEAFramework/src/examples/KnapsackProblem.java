@@ -15,17 +15,17 @@ public class KnapsackProblem extends AbstractProblem {
 	/**
 	 * The number of items.
 	 */
-	public static int		nitems		= 5;
+	public static int		nitems		= 10;
 
 	/**
 	 * Entry {@code profit[i][j]} is the profit from including item {@code j} in sack {@code i}.
 	 */
-	public static int[][]	profit		= { { 2, 5 }, { 1, 4 }, { 6, 2 }, { 5, 1 }, { 3, 3 } };
+	public static int[][]	profit		= { { 2, 5 }, { 1, 4 }, { 6, 2 }, { 5, 1 }, { 3, 3 }, { 2, 5 }, { 1, 4 }, { 6, 2 }, { 5, 1 }, { 3, 3 } };
 
 	/**
 	 * Entry {@code weight[i][j]} is the weight incurred from including item {@code j} in sack {@code i}.
 	 */
-	public static int[][]	weight		= { { 3, 3 }, { 4, 2 }, { 1, 5 }, { 5, 3 }, { 5, 2 } };
+	public static int[][]	weight		= { { 3, 3 }, { 4, 2 }, { 1, 5 }, { 5, 3 }, { 5, 2 }, { 2, 5 }, { 1, 4 }, { 6, 2 }, { 5, 1 }, { 3, 3 } };
 
 	/**
 	 * Entry {@code capacity[i]} is the weight capacity of sack {@code i}.

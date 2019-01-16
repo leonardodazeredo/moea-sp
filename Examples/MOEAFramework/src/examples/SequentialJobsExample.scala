@@ -45,7 +45,5 @@ object SequentialJobsExample {
 
     moeaAdaptor.printPopulation(front)
 
-    moeaAdaptor.showPlot("NSGAII", front)
-
   }
 }

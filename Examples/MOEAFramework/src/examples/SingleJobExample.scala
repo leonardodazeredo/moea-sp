@@ -39,8 +39,6 @@ object SingleJobExample {
 
     moeaAdaptor.printPopulation(front)
 
-    moeaAdaptor.showPlot("NSGAII", front)
-
     println("Population size of last shuffle: " + population.size)
 
   }
