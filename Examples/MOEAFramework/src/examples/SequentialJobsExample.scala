@@ -10,8 +10,6 @@ import com.ufrj.pesc.moeasp.core.IslandsSparkSequentialRunner
 import com.ufrj.pesc.moeasp.core.MOEASpParameter
 import com.ufrj.pesc.moeasp.core.OptimizationContext
 
-import chapter.KnapsackProblem
-
 object SequentialJobsExample {
 
   def main(args: Array[String]): Unit = {
@@ -26,7 +24,7 @@ object SequentialJobsExample {
 
     val parameterMap = HashMap[String, MOEASpParameter]()
 
-    val oc = OptimizationContext(moeaAdaptor, "chapter.KnapsackProblem", "NSGAII", parameterMap,
+    val oc = OptimizationContext(moeaAdaptor, "examples.KnapsackProblem", "NSGAII", parameterMap,
       totalPopulationSize = 50000,
       numOfIslands = 100,
       migrationSizeInIslandPercentage = 0.1,

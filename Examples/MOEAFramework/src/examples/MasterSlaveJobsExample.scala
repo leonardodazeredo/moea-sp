@@ -21,8 +21,6 @@ import org.moeaframework.core.operator.real.SBX
 import com.ufrj.pesc.moeasp.adaptors.MOEAFrameworkAdaptor
 import com.ufrj.pesc.moeasp.adaptors.NSGAII_SP
 
-import chapter.KnapsackProblem
-
 object MasterSlaveJobsExample {
 
   implicit def arrayToList[A](a: Array[A]) = a.toList

@@ -1,4 +1,4 @@
-package chapter;
+package examples;
 
 import org.moeaframework.core.Solution;
 import org.moeaframework.core.variable.EncodingUtils;

@@ -10,7 +10,6 @@ import com.ufrj.pesc.moeasp.core.IslandsSparkSingleRunner
 import com.ufrj.pesc.moeasp.core.MOEASpParameter
 import com.ufrj.pesc.moeasp.core.OptimizationContext
 
-import chapter.KnapsackProblem
 import com.ufrj.pesc.moeasp.util.Utils
 
 object SingleJobExample {
@@ -27,7 +26,7 @@ object SingleJobExample {
 
     val parameterMap = HashMap[String, MOEASpParameter]()
 
-    val oc = OptimizationContext(moeaAdaptor, "chapter.KnapsackProblem", "NSGAII", parameterMap,
+    val oc = OptimizationContext(moeaAdaptor, "examples.KnapsackProblem", "NSGAII", parameterMap,
       totalPopulationSize = 50000,
       numOfIslands = 100,
       migrationSizeInIslandPercentage = 0.1,
