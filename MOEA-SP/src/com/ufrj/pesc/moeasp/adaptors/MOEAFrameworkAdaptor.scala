@@ -6,29 +6,45 @@ import scala.collection.JavaConverters.seqAsJavaListConverter
 import org.apache.spark.SparkContext
 import org.moeaframework.algorithm.AbstractEvolutionaryAlgorithm
 import org.moeaframework.algorithm.NSGAII
-import org.moeaframework.analysis.plot.Plot
-import org.moeaframework.core.EpsilonBoxDominanceArchive
-import org.moeaframework.core.Initialization
-import org.moeaframework.core.NondominatedPopulation
-import org.moeaframework.core.NondominatedSortingPopulation
-import org.moeaframework.core.Problem
-import org.moeaframework.core.Selection
-import org.moeaframework.core.Solution
-import org.moeaframework.core.Variation
-import org.moeaframework.core.comparator.ChainedComparator
-import org.moeaframework.core.comparator.CrowdingComparator
-import org.moeaframework.core.comparator.ParetoDominanceComparator
-import org.moeaframework.core.operator.CompoundVariation
-import org.moeaframework.core.operator.GAVariation
-import org.moeaframework.core.operator.InjectedInitialization
-import org.moeaframework.core.operator.RandomInitialization
-import org.moeaframework.core.operator.TournamentSelection
-import org.moeaframework.core.operator.real.PM
-import org.moeaframework.core.operator.real.SBX
 
 import com.ufrj.pesc.moeasp.core.MOEASpProblem
 import com.ufrj.pesc.moeasp.core.MOEASpSolution
 import com.ufrj.pesc.moeasp.core.OptimizationContext
+
+import com.ufrj.pesc.moeasp.util.Utils
+import org.moeaframework.core.Solution
+import org.moeaframework.core.EpsilonBoxDominanceArchive
+import org.moeaframework.core.Variation
+import org.moeaframework.core.comparator.ChainedComparator
+import org.moeaframework.core.NondominatedSortingPopulation
+import org.moeaframework.core.operator.real.SBX
+import org.moeaframework.core.Initialization
+import org.moeaframework.core.operator.real.PM
+import org.moeaframework.core.NondominatedPopulation
+import org.moeaframework.core.operator.GAVariation
+import org.moeaframework.analysis.plot.Plot
+import org.moeaframework.core.comparator.ParetoDominanceComparator
+import org.moeaframework.core.comparator.CrowdingComparator
+import org.moeaframework.core.operator.RandomInitialization
+import org.moeaframework.core.operator.InjectedInitialization
+import org.moeaframework.core.Problem
+import org.moeaframework.core.operator.TournamentSelection
+import org.moeaframework.core.Selection
+import org.moeaframework.core.Solution
+import org.moeaframework.core.EpsilonBoxDominanceArchive
+import org.moeaframework.core.Variation
+import org.moeaframework.core.comparator.ChainedComparator
+import org.moeaframework.core.NondominatedSortingPopulation
+import org.moeaframework.core.operator.real.SBX
+import org.moeaframework.core.Initialization
+import org.moeaframework.core.operator.real.PM
+import org.moeaframework.core.NondominatedPopulation
+import org.moeaframework.core.operator.GAVariation
+import org.moeaframework.analysis.plot.Plot
+import org.moeaframework.core.comparator.ParetoDominanceComparator
+import org.moeaframework.core.comparator.CrowdingComparator
+import org.moeaframework.core.operator.RandomInitialization
+import org.moeaframework.core.operator.InjectedInitialization
 
 class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
@@ -48,12 +64,14 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
   def run(pc: OptimizationContext, iniPopulation: Iterable[MOEASpSolution] = List[MOEASpSolution]()): (Iterator[MOEASpSolution], Iterator[MOEASpSolution]) = {
 
+    val problemInstance = Utils.instantiate(pc.problemClassName)
+
     if (iniPopulation.isEmpty) {
-      val iniPopulation = generateRandomPopulation(pc.problem, 1000)
+      val iniPopulation = generateRandomPopulation(problemInstance, 1000)
     }
 
     val initialization = new InjectedInitialization(
-      pc.problem.asInstanceOf[Problem],
+      problemInstance.asInstanceOf[Problem],
       iniPopulation.size,
       iniPopulation.asInstanceOf[List[Solution]].asJava);
 
@@ -71,10 +89,10 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
       val variation = new GAVariation(
         new SBX(1.0, 25.0),
-        new PM(1.0 / pc.problem.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
+        new PM(1.0 / problemInstance.asInstanceOf[Problem].getNumberOfVariables(), 30.0));
 
       algorithm = new NSGAII(
-        pc.problem.asInstanceOf[Problem],
+        problemInstance.asInstanceOf[Problem],
         new NondominatedSortingPopulation(),
         null, // no archive
         selection,

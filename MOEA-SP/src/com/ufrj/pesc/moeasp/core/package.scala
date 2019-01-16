@@ -5,15 +5,15 @@ import scala.collection.mutable.HashMap
 import com.ufrj.pesc.moeasp.adaptors.MOEASpAdaptor
 
 package object core {
-  type MOEASpSolution = Object
+  type MOEASpSolution = AnyRef
 
-  type MOEASpProblem = Object
+  type MOEASpProblem = AnyRef
   
-  type MOEASpParameter = Object
+  type MOEASpParameter = AnyRef
   
   type Individual = (Int, MOEASpSolution)
 
-  case class OptimizationContext(moeaAdaptor: MOEASpAdaptor, problem: MOEASpProblem, algorithmId: String, parameterMap: HashMap[String,MOEASpParameter],
+  case class OptimizationContext(moeaAdaptor: MOEASpAdaptor, problemClassName: String, algorithmId: String, parameterMap: HashMap[String,MOEASpParameter],
                                  totalPopulationSize:              Int,
                                  numOfIslands:                     Int,
                                  migrationSizeInIslandPercentage:  Double,
