@@ -33,7 +33,6 @@ import com.ufrj.pesc.moeasp.core.OptimizationContext
 class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
   def generateRandomPopulation(problem: MOEASpProblem, size: Int): Iterable[MOEASpSolution] = {
-    implicit def arrayToList[A](a: Array[A]) = a.toList
 
     val ini = new RandomInitialization(problem.asInstanceOf[Problem], size)
 
@@ -133,8 +132,6 @@ class NSGAII_SP(sc: SparkContext, problem: Problem, population: NondominatedSort
                 selection: Selection, variation: Variation, initialization: Initialization) extends NSGAII(problem, population, archive, selection, variation, initialization) with Serializable {
 
   override def evaluateAll(solutions: java.lang.Iterable[Solution]): Unit = {
-
-    implicit def arrayToList[A](a: Array[A]) = a.toList
 
     val p = problem
 

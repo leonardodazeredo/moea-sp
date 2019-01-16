@@ -35,8 +35,6 @@ class IslandsSparkSequentialRunner(sparkContext: SparkContext, optimizationConte
 
       running = true
 
-      implicit def arrayToList[A](a: Array[A]) = a.toList
-
       val oc = optimizationContext
 
       val sc = sparkContext

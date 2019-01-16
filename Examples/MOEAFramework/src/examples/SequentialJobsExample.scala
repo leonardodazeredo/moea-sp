@@ -15,7 +15,6 @@ import chapter.KnapsackProblem
 object SequentialJobsExample {
 
   def main(args: Array[String]): Unit = {
-    implicit def arrayToList[A](a: Array[A]) = a.toList
 
     val conf = new SparkConf()
       .setAppName("main")

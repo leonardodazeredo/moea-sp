@@ -14,8 +14,6 @@ import chapter.KnapsackProblem
 
 object SingleJobExample {
 
-  implicit def arrayToList[A](a: Array[A]) = a.toList
-
   def main(args: Array[String]): Unit = {
 
     val conf = new SparkConf()

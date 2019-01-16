@@ -8,8 +8,6 @@ class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: 
 
   def run(): (Iterable[MOEASpSolution], Iterable[MOEASpSolution]) = {
 
-    implicit def arrayToList[A](a: Array[A]) = a.toList
-
     val oc = optimizationContext
 
     val sc = sparkContext
