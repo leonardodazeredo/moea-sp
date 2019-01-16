@@ -3,6 +3,7 @@ package com.ufrj.pesc.moeasp.core
 import org.apache.spark.SparkContext
 
 import com.ufrj.pesc.moeasp.partitioner.FollowKeyPartitioner
+import com.ufrj.pesc.moeasp.util.Utils
 
 class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
 
@@ -12,7 +13,9 @@ class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: 
 
     val sc = sparkContext
 
-    val iniPopulation = optimizationContext.moeaAdaptor.generateRandomPopulation(oc.problem, oc.totalPopulationSize)
+    val problemInstance = Utils.instantiate(oc.problemClassName)
+
+    val iniPopulation = optimizationContext.moeaAdaptor.generateRandomPopulation(problemInstance, oc.totalPopulationSize)
 
     val iniPopulationWithId = iniPopulation.map(s => (0, s))
 

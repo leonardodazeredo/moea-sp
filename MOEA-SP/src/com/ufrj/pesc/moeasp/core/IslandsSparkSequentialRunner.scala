@@ -39,7 +39,9 @@ class IslandsSparkSequentialRunner(sparkContext: SparkContext, optimizationConte
 
       val sc = sparkContext
 
-      val iniPopulation = oc.moeaAdaptor.generateRandomPopulation(oc.problem, oc.totalPopulationSize)
+      val problemInstance = Utils.instantiate(oc.problemClassName)
+
+      val iniPopulation = oc.moeaAdaptor.generateRandomPopulation(problemInstance, oc.totalPopulationSize)
 
       val iniPopulationWithId = iniPopulation.map(s => (0, s))
 

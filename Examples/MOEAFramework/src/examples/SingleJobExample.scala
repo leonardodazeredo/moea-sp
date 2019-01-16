@@ -26,7 +26,7 @@ object SingleJobExample {
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
     val parameterMap = HashMap[String, MOEASpParameter]()
-    
+
     val oc = OptimizationContext(moeaAdaptor, "chapter.KnapsackProblem", "NSGAII", parameterMap,
       totalPopulationSize = 50000,
       numOfIslands = 100,
