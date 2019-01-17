@@ -6,7 +6,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry exported="true" kind="lib" path="src/resources/moeaframework-2.12.jar"/>
+	<classpathentry exported="true" kind="lib" path="src/resources/moeaframework-2.12-mod.jar"/>
 	<classpathentry kind="src" output="target/classes" path="src">
 		<attributes>
 			<attribute name="optional" value="true"/>

@@ -71,8 +71,6 @@ object MasterSlaveJobsExample {
 
     moeaAdaptor.printPopulation(front)
 
-    moeaAdaptor.showPlot("NSGAII", front)
-
   }
 
 }
