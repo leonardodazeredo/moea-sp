@@ -5,7 +5,7 @@ import org.apache.spark.SparkContext
 import com.ufrj.pesc.moeasp.partitioner.FollowKeyPartitioner
 import com.ufrj.pesc.moeasp.util.Utils
 
-class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
+class IslandsSparkExecutor(sparkContext: SparkContext, optimizationContext: OptimizationContext) {
 
   def run(): (Iterable[MOEASpSolution], Iterable[MOEASpSolution]) = {
 

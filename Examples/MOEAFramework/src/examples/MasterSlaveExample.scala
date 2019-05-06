@@ -35,7 +35,7 @@ object MasterSlaveJobsExample {
 
     val moeaAdaptor = new MOEAFrameworkAdaptor()
 
-    val problem = new KnapsackProblem();
+    val problem = new KnapsackProblemExample();
 
     val iniPopulation = moeaAdaptor.generateRandomPopulation(problem, 50000)
 

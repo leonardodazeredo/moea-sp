@@ -6,7 +6,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
 import com.ufrj.pesc.moeasp.adaptors.MOEAFrameworkAdaptor
-import com.ufrj.pesc.moeasp.core.IslandsSparkSingleRunner
+import com.ufrj.pesc.moeasp.core.IslandsSparkExecutor
 import com.ufrj.pesc.moeasp.core.MOEASpParameter
 import com.ufrj.pesc.moeasp.core.OptimizationContext
 
@@ -26,7 +26,7 @@ object SingleJobExample {
 
     val parameterMap = HashMap[String, MOEASpParameter]()
 
-    val oc = OptimizationContext(moeaAdaptor, "examples.KnapsackProblem", "NSGAII", parameterMap,
+    val oc = OptimizationContext(moeaAdaptor, "examples.KnapsackProblemExample", "NSGAII", parameterMap,
       totalPopulationSize = 10000,
       numOfIslands = 50,
       migrationSizeInIslandPercentage = 0.1,
@@ -35,7 +35,7 @@ object SingleJobExample {
       true, true,
       "/media/leo/work/git/lab-spark/Examples/populations/")
 
-    val (result, population) = (new IslandsSparkSingleRunner(sc, oc)).run()
+    val (result, population) = (new IslandsSparkExecutor(sc, oc)).run()
 
     val front = result.toList
 

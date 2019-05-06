@@ -5,7 +5,7 @@ import org.moeaframework.core.variable.EncodingUtils;
 import org.moeaframework.problem.AbstractProblem;
 import org.moeaframework.util.Vector;
 
-public class KnapsackProblem extends AbstractProblem {
+public class KnapsackProblemExample extends AbstractProblem {
 
 	/**
 	 * The number of sacks.
@@ -32,7 +32,7 @@ public class KnapsackProblem extends AbstractProblem {
 	 */
 	public static int[]		capacity	= { 10, 8 };
 
-	public KnapsackProblem() {
+	public KnapsackProblemExample() {
 		super(1, nsacks, nsacks);
 	}
 
