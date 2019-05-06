@@ -27,11 +27,13 @@ object SingleJobExample {
     val parameterMap = HashMap[String, MOEASpParameter]()
 
     val oc = OptimizationContext(moeaAdaptor, "examples.KnapsackProblem", "NSGAII", parameterMap,
-      totalPopulationSize = 50000,
-      numOfIslands = 100,
+      totalPopulationSize = 10000,
+      numOfIslands = 50,
       migrationSizeInIslandPercentage = 0.1,
       numOfMigrations = 4,
-      numberOfEvaluationsInIslandRatio = 10)
+      numberOfEvaluationsInIslandRatio = 10,
+      true, true,
+      "/media/leo/work/git/lab-spark/Examples/populations/")
 
     val (result, population) = (new IslandsSparkSingleRunner(sc, oc)).run()
 

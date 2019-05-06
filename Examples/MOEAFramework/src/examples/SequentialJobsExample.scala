@@ -29,7 +29,9 @@ object SequentialJobsExample {
       numOfIslands = 100,
       migrationSizeInIslandPercentage = 0.1,
       numOfMigrations = 4,
-      numberOfEvaluationsInIslandRatio = 10)
+      numberOfEvaluationsInIslandRatio = 10,
+      true, true,
+      "/media/leo/work/git/lab-spark/Examples/populations/")
 
     val runner = new IslandsSparkSequentialRunner(sc, oc)
 

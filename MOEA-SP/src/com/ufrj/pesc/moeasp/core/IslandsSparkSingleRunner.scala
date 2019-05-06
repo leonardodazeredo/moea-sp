@@ -26,6 +26,15 @@ class IslandsSparkSingleRunner(sparkContext: SparkContext, optimizationContext: 
 
       rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.setNewIslands(oc, index, iter))
 
+      if (oc.savePopulationsToFile) {
+        rddCurrentPopulation.saveAsObjectFile(optimizationContext.populationDir + "complete/migration_" + i)
+      }
+
+      if (oc.savePopulationsToFile) {
+        val rddCurrentNondominatedPopulationpopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
+        rddCurrentNondominatedPopulationpopulation.saveAsObjectFile(optimizationContext.populationDir + "nondominated/migration_" + i)
+      }
+      
       rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
     }
 
