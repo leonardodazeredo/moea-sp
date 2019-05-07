@@ -38,6 +38,8 @@ class IslandsSparkExecutor(sparkContext: SparkContext, optimizationContext: Opti
       }
 
       rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
+
+      Utils.unPersistAllRdds(sc)
     }
 
     rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.inIslandRun(oc, index, iter))
@@ -45,8 +47,6 @@ class IslandsSparkExecutor(sparkContext: SparkContext, optimizationContext: Opti
     rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
 
     val final_population = rddCurrentPopulation.collect.toList.map(ind => ind._2)
-
-    Utils.unPersistAllRdds(sc)
 
     (optimizationContext.moeaAdaptor.getNondominatedPopulation(final_population), final_population)
   }
