@@ -28,18 +28,24 @@ class IslandsSparkExecutor(sparkContext: SparkContext, optimizationContext: Opti
 
       if (oc.savePopulationsToFile || oc.saveNonDominatedPopulationsToFile) {
         rddCurrentPopulation.persist()
-      }
-      if (oc.savePopulationsToFile) {
-        rddCurrentPopulation.saveAsObjectFile(optimizationContext.populationDir + "complete/migration_" + i)
-      }
-      if (oc.saveNonDominatedPopulationsToFile) {
-        val rddCurrentNondominatedPopulationpopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
-        rddCurrentNondominatedPopulationpopulation.saveAsObjectFile(optimizationContext.populationDir + "nondominated/migration_" + i)
+        val rddCurrentPopulationPersisted = rddCurrentPopulation
+
+        if (oc.savePopulationsToFile) {
+          rddCurrentPopulationPersisted.saveAsObjectFile(optimizationContext.populationDir + "complete/migration_" + i)
+        }
+        if (oc.saveNonDominatedPopulationsToFile) {
+          val rddCurrentNondominatedPopulationpopulation = rddCurrentPopulationPersisted.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
+          rddCurrentNondominatedPopulationpopulation.saveAsObjectFile(optimizationContext.populationDir + "nondominated/migration_" + i)
+        }
+
+        rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
+
+        //rddCurrentPopulationPersisted.unpersist() //OVERHEAD DE TEMPO VS ARMAZENAMENDO
+      } 
+      else {
+        rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
       }
 
-      rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
-
-      Utils.unPersistAllRdds(sc)
     }
 
     rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.inIslandRun(oc, index, iter))

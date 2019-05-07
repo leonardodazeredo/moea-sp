@@ -32,7 +32,7 @@ object SingleJobExample {
       migrationSizeInIslandPercentage = 0.1,
       numOfMigrations = 5,
       numberOfEvaluationsInIslandRatio = 10,
-      true, true,
+      false, true,
       "/media/leo/work/git/lab-spark/Examples/populations/")
 
     val (result, population) = (new IslandsSparkExecutor(sc, oc)).run()
