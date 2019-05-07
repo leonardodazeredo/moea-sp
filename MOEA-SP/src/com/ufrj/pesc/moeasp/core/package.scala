@@ -20,6 +20,5 @@ package object core {
                                  numOfMigrations:                  Int,
                                  numberOfEvaluationsInIslandRatio: Double,
                                  savePopulationsToFile: Boolean,
-                                 saveNonDominatedPopulationsToFile: Boolean,
                                  populationDir: String)
 }
