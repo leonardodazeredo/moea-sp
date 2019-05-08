@@ -47,6 +47,9 @@ class IslandsSparkExecutor(sparkContext: SparkContext, optimizationContext: Opti
 
     rddCurrentPopulation = rddCurrentPopulation.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
 
+    rddCurrentPopulation.persist()
+    rddCurrentPopulation.saveAsObjectFile(optimizationContext.populationDir + "nondominated/migration_final")
+
     val final_population = rddCurrentPopulation.collect.toList.map(ind => ind._2)
 
     (optimizationContext.moeaAdaptor.getNondominatedPopulation(final_population), final_population)
