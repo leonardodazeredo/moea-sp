@@ -37,14 +37,9 @@ class IslandsSparkExecutor(sparkContext: SparkContext, optimizationContext: Opti
           val rddCurrentNondominatedPopulationpopulation = rddCurrentPopulationPersisted.mapPartitionsWithIndex((index, iter) => SparkFunctions.getNondominatedPopulationInIsland(oc, index, iter))
           rddCurrentNondominatedPopulationpopulation.saveAsObjectFile(optimizationContext.populationDir + "nondominated/migration_" + i)
         }
-
-        rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
-
-        //rddCurrentPopulationPersisted.unpersist() //OVERHEAD DE TEMPO VS ARMAZENAMENDO
-      } 
-      else {
-        rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
       }
+
+      rddCurrentPopulation = rddCurrentPopulation.partitionBy(new FollowKeyPartitioner(optimizationContext.numOfIslands))
 
     }
 
