@@ -15,22 +15,11 @@ object SparkFunctions extends Serializable {
     descendant_population.map(s => (islandId, s))
   }
 
-  def setNewIslands(pc: OptimizationContext, islandId: Int, iter: Iterator[Individual]): Iterator[Individual] = {
+  def setNewIslands(oc: OptimizationContext, islandId: Int, iter: Iterator[Individual]): Iterator[Individual] = {
 
     val individualList = iter.toList
-
-    val islandsIdsList = List.range(0, pc.numOfIslands).filterNot(i => i == islandId)
-
-    val indexesList = Random.shuffle(List.range(0, individualList.size)).take((pc.migrationSizeInIslandPercentage * individualList.size).toInt)
-
-    val random = new Random()
-
-    val newIndividualArray = individualList.toArray
-
-    for (i <- indexesList) {
-      val newIslandId = Utils.getRandomElement(islandsIdsList.to[Seq], random)
-      newIndividualArray(i) = (newIslandId, individualList(i)._2)
-    }
+    
+    val newIndividualArray = oc.moeaAdaptor.markMigration(oc, islandId, individualList)
 
     newIndividualArray.toList.iterator
   }

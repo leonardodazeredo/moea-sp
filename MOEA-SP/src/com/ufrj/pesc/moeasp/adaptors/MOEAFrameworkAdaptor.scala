@@ -2,49 +2,35 @@ package com.ufrj.pesc.moeasp.adaptors
 
 import scala.collection.JavaConverters.iterableAsScalaIterableConverter
 import scala.collection.JavaConverters.seqAsJavaListConverter
+import scala.util.Random
 
 import org.apache.spark.SparkContext
 import org.moeaframework.algorithm.AbstractEvolutionaryAlgorithm
 import org.moeaframework.algorithm.NSGAII
+import org.moeaframework.analysis.plot.Plot
+import org.moeaframework.core.EpsilonBoxDominanceArchive
+import org.moeaframework.core.Initialization
+import org.moeaframework.core.NondominatedPopulation
+import org.moeaframework.core.NondominatedSortingPopulation
+import org.moeaframework.core.Problem
+import org.moeaframework.core.Selection
+import org.moeaframework.core.Solution
+import org.moeaframework.core.Variation
+import org.moeaframework.core.comparator.ChainedComparator
+import org.moeaframework.core.comparator.CrowdingComparator
+import org.moeaframework.core.comparator.ParetoDominanceComparator
+import org.moeaframework.core.operator.GAVariation
+import org.moeaframework.core.operator.InjectedInitialization
+import org.moeaframework.core.operator.RandomInitialization
+import org.moeaframework.core.operator.TournamentSelection
+import org.moeaframework.core.operator.real.PM
+import org.moeaframework.core.operator.real.SBX
 
+import com.ufrj.pesc.moeasp.core.Individual
 import com.ufrj.pesc.moeasp.core.MOEASpProblem
 import com.ufrj.pesc.moeasp.core.MOEASpSolution
 import com.ufrj.pesc.moeasp.core.OptimizationContext
-
 import com.ufrj.pesc.moeasp.util.Utils
-import org.moeaframework.core.Solution
-import org.moeaframework.core.EpsilonBoxDominanceArchive
-import org.moeaframework.core.Variation
-import org.moeaframework.core.comparator.ChainedComparator
-import org.moeaframework.core.NondominatedSortingPopulation
-import org.moeaframework.core.operator.real.SBX
-import org.moeaframework.core.Initialization
-import org.moeaframework.core.operator.real.PM
-import org.moeaframework.core.NondominatedPopulation
-import org.moeaframework.core.operator.GAVariation
-import org.moeaframework.analysis.plot.Plot
-import org.moeaframework.core.comparator.ParetoDominanceComparator
-import org.moeaframework.core.comparator.CrowdingComparator
-import org.moeaframework.core.operator.RandomInitialization
-import org.moeaframework.core.operator.InjectedInitialization
-import org.moeaframework.core.Problem
-import org.moeaframework.core.operator.TournamentSelection
-import org.moeaframework.core.Selection
-import org.moeaframework.core.Solution
-import org.moeaframework.core.EpsilonBoxDominanceArchive
-import org.moeaframework.core.Variation
-import org.moeaframework.core.comparator.ChainedComparator
-import org.moeaframework.core.NondominatedSortingPopulation
-import org.moeaframework.core.operator.real.SBX
-import org.moeaframework.core.Initialization
-import org.moeaframework.core.operator.real.PM
-import org.moeaframework.core.NondominatedPopulation
-import org.moeaframework.core.operator.GAVariation
-import org.moeaframework.analysis.plot.Plot
-import org.moeaframework.core.comparator.ParetoDominanceComparator
-import org.moeaframework.core.comparator.CrowdingComparator
-import org.moeaframework.core.operator.RandomInitialization
-import org.moeaframework.core.operator.InjectedInitialization
 
 class MOEAFrameworkAdaptor extends MOEASpAdaptor {
 
@@ -109,6 +95,25 @@ class MOEAFrameworkAdaptor extends MOEASpAdaptor {
     }
 
     (algo.getResult.asScala.iterator, algo.getPopulation.asScala.iterator)
+  }
+
+  def markMigration(oc: OptimizationContext, islandId: Int, islandPopulation: Iterable[Individual]): Iterable[Individual] = {
+    val individualList = islandPopulation.toList
+
+    val islandsIdsList = List.range(0, oc.numOfIslands).filterNot(i => i == islandId)
+
+    val indexesList = Random.shuffle(List.range(0, individualList.size)).take((oc.migrationSizeInIslandPercentage * individualList.size).toInt)
+
+    val random = new Random()
+
+    val newIndividualArray = individualList.toArray
+
+    for (i <- indexesList) {
+      val newIslandId = Utils.getRandomElement(islandsIdsList.to[Seq], random)
+      newIndividualArray(i) = (newIslandId, individualList(i)._2)
+    }
+
+    newIndividualArray.toList
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
