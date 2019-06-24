@@ -7,7 +7,7 @@ import com.ufrj.pesc.moeasp.core.MOEASpProblem
 import com.ufrj.pesc.moeasp.core.MOEASpSolution
 import com.ufrj.pesc.moeasp.core.Individual
 
-trait MOEASpAdaptor extends Serializable {
+trait MOEASpInterface extends Serializable {
 
   def generateRandomPopulation(problem: MOEASpProblem, size: Int): Iterable[MOEASpSolution]
 

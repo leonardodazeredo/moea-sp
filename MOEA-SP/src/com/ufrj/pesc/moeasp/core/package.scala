@@ -2,7 +2,7 @@ package com.ufrj.pesc.moeasp
 
 import scala.collection.mutable.HashMap
 
-import com.ufrj.pesc.moeasp.adaptors.MOEASpAdaptor
+import com.ufrj.pesc.moeasp.adaptors.MOEASpInterface
 
 package object core {
   type MOEASpSolution = AnyRef
@@ -13,7 +13,7 @@ package object core {
   
   type Individual = (Int, MOEASpSolution)
 
-  case class OptimizationContext(moeaAdaptor: MOEASpAdaptor, problemClassName: String, algorithmId: String, parameterMap: HashMap[String,MOEASpParameter],
+  case class OptimizationContext(moeaAdaptor: MOEASpInterface, problemClassName: String, algorithmId: String, parameterMap: HashMap[String,MOEASpParameter],
                                  totalPopulationSize:              Int,
                                  numOfIslands:                     Int,
                                  migrationSizeInIslandPercentage:  Double,

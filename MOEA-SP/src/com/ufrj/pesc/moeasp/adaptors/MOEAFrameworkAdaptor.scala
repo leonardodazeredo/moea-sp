@@ -32,7 +32,7 @@ import com.ufrj.pesc.moeasp.core.MOEASpSolution
 import com.ufrj.pesc.moeasp.core.OptimizationContext
 import com.ufrj.pesc.moeasp.util.Utils
 
-class MOEAFrameworkAdaptor extends MOEASpAdaptor {
+class MOEAFrameworkAdaptor extends MOEASpInterface {
 
   def generateRandomPopulation(problem: MOEASpProblem, size: Int): Iterable[MOEASpSolution] = {
 
