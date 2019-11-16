@@ -14,12 +14,12 @@ package object core {
   type Individual = (Int, MOEASpSolution)
 
   case class OptimizationContext(moeaAdaptor: MOEASpInterface, problemClassName: String, algorithmId: String, parameterMap: HashMap[String,MOEASpParameter],
-                                 totalPopulationSize:              Int,
-                                 numOfIslands:                     Int,
-                                 migrationSizeInIslandPercentage:  Double,
-                                 numOfMigrations:                  Int,
-                                 numberOfEvaluationsInIslandRatio: Double,
-                                 savePopulationsToFile: Boolean,
+                                 totalPopulationSize:               Int,
+                                 numOfIslands:                      Int,
+                                 migrationSizeInIslandPercentage:   Double,
+                                 numOfMigrations:                   Int,
+                                 numberOfEvaluationsInIslandRatio:  Double,
+                                 savePopulationsToFile:             Boolean,
                                  saveNonDominatedPopulationsToFile: Boolean,
-                                 populationDir: String)
+                                 populationDir:                     String)
 }

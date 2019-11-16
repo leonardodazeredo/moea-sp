@@ -12,7 +12,7 @@ import com.ufrj.pesc.moeasp.core.OptimizationContext
 
 import com.ufrj.pesc.moeasp.util.Utils
 
-object SingleJobExample {
+object IslandsExample {
 
   def main(args: Array[String]): Unit = {
 
